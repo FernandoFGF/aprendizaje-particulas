@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprendizaje por Clasificación</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Font Awesome para íconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- CSS personalizado -->
+    <style>
+        .image-zoom-container {
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            overflow: hidden;
+            cursor: zoom-in;
+        }
+        .image-zoom-container img {
+            transition: transform 0.3s;
+            width: 100%;
+        }
+        .image-original-container {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+        }
+        .image-original-container img {
+            margin: 0 auto;
+            max-width: 80%;
+            height: auto;
+            display: block;
+        }
+        .classification-form > div {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .classification-form label.form-label {
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .classification-section:not(.hidden) {
+            transition: border-left 0.3s ease;
+            border-left: 3px solid transparent;
+            padding-left: 10px;
+        }
+
+        .classification-section:not(.hidden).incomplete {
+            border-left: 3px solid #dc3545;
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+
+
+        .no-images {
+            padding: 2rem;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #6c757d;
+        }
+        #next-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+
+        .classification-section:not(.hidden):not(.completed) {
+            border-left: 3px solid #dc3545;
+            padding-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Cabecera -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3">Aprendizaje por clasificación</h1>
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="progress mb-4">
+            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+
+        <!-- Contenedor de pregunta -->
+        <div id="question-wrapper">
+            <div class="card mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Pregunta <span id="question-number"></span> de <span id="total-questions"></span></h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">¿Qué tipo de partícula se muestra en la siguiente imagen?</p>
+
+                    <!-- Contenedor de imagen -->
+                    <div class="image-original-container mb-3 text-center">
+                        {% if current_image %}
+                        <img src="{{ url_for('serve_external_image', filename=current_image.path) }}"
+                             alt="Imagen de partícula"
+                             class="img-fluid"
+                             id="zoom-image">
+                        {% else %}
+                        <div class="no-images">
+                            No hay imágenes disponibles con los filtros seleccionados
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Opciones de respuesta -->
+                    <div class="classification-form">
+                        <!-- Tipo de interacción -->
+                        <div class="mb-3 classification-section" id="interaction-section">
+                            <label class="form-label fw-bold">Tipo de interacción:</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_type" id="q-cc" value="CC" required>
+                                    <label class="form-check-label" for="q-cc">CC</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_type" id="q-nc" value="NC">
+                                    <label class="form-check-label" for="q-nc">NC</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sabor -->
+                        <div class="mb-3 classification-section" id="flavor-section">
+                            <label class="form-label fw-bold">Sabor:</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flavor" id="q-muon" value="Muón" required>
+                                    <label class="form-check-label" for="q-muon">Muón</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flavor" id="q-electron" value="Electrón">
+                                    <label class="form-check-label" for="q-electron">Electrón</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="flavor" id="q-tau" value="Tau">
+                                    <label class="form-check-label" for="q-tau">Tau</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Modo de interacción -->
+                        <div class="mb-3 classification-section" id="mode-section">
+                            <label class="form-label fw-bold">Modo de interacción:</label>
+                            <div class="d-flex flex-wrap gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-qe" value="QE" required>
+                                    <label class="form-check-label" for="q-qe">QE</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-mec" value="MEC">
+                                    <label class="form-check-label" for="q-mec">MEC</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-res" value="RES">
+                                    <label class="form-check-label" for="q-res">RES</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-dis" value="DIS">
+                                    <label class="form-check-label" for="q-dis">DIS</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-coh" value="COH">
+                                    <label class="form-check-label" for="q-coh">COH</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación -->
+        <div class="d-flex justify-content-between">
+            <button id="prev-btn" class="btn btn-outline-primary" disabled>
+                <i class="fas fa-arrow-left me-2"></i>Anterior
+            </button>
+            <div class="position-relative d-inline-block" data-bs-toggle="tooltip"
+                 title="Selecciona una opción en cada categoría visible" id="next-btn-wrapper">
+                <button id="next-btn" class="btn btn-primary" disabled>
+                    Siguiente<i class="fas fa-arrow-right ms-2"></i>
+                </button>
+            </div>
+            <button id="submit-btn" class="btn btn-success d-none">
+                Enviar Examen
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Elemento oculto para pasar datos al JavaScript -->
+    <script id="imagenes-data" type="application/json">{{ all_images | tojson | safe }}</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/answerValidation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/exerciseFilters.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/imageNavigation.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
