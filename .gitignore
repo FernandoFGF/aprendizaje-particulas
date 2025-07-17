@@ -1,0 +1,23 @@
+# Entornos virtuales
+venv/
+.env/
+AprendizajeParticulas/  # Excluye tu antiguo entorno conda
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+
+# Variables de entorno
+.env
+.env.local
+
+# IDEs
+.idea/git sta
+.vscode/
+*.swp
+
+# Sistemas operativos
+.DS_Store  # macOS
+Thumbs.db  # Windows
