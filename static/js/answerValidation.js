@@ -29,6 +29,7 @@ class AnswerValidator {
     updateNextButtonState() {
         const nextBtn = document.getElementById('next-btn');
         const nextBtnWrap = document.getElementById('next-btn-wrapper')
+        const submitBtn = document.getElementById('submit-btn');
         if (!nextBtn) return;
 
         const allAnswered = this.requiredSections.every(sectionId => {
@@ -44,6 +45,37 @@ class AnswerValidator {
 
         nextBtn.disabled = !allAnswered;
         this.setupButtonTooltip(nextBtnWrap, nextBtn.disabled);
+
+        if (submitBtn) {
+            const isLastImage = window.currentImageNavigator?.currentIndex === window.currentImageNavigator?.images.length - 1;
+            if (isLastImage && allAnswered) {
+                this.showSubmitButton();
+            } else {
+                this.hideSubmitButton();
+            }
+        }
+    }
+
+    showSubmitButton() {
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (nextBtn && submitBtn) {
+            nextBtn.style.display = 'none';
+            submitBtn.classList.remove('d-none');
+            submitBtn.classList.add('d-block');
+        }
+    }
+
+    hideSubmitButton() {
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+
+        if (nextBtn && submitBtn) {
+            nextBtn.style.display = 'inline-block';
+            submitBtn.classList.add('d-none');
+            submitBtn.classList.remove('d-block');
+        }
     }
 
     initializeTooltip(element) {

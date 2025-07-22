@@ -3,6 +3,7 @@ class ImageNavigator {
         this.images = images;
         this.currentIndex = currentIndex;
         this.answerValidator = new AnswerValidator();
+        this.zoomInstance = null;
         this.initElements();
         this.setupEventListeners();
         this.updateUI(true);
@@ -45,9 +46,24 @@ class ImageNavigator {
         }
 
         const image = this.images[this.currentIndex];
+        const imgElement = this.elements.zoomImage;
         this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(image.path)}`;
+        this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(image.path)}`;
         this.elements.questionNumber.textContent = this.currentIndex + 1;
         this.elements.totalQuestions.textContent = this.images.length;
+
+        if (this.zoomInstance) {
+            this.zoomInstance.destroy();
+        }
+
+        this.zoomInstance = new ImageZoom(imgElement, {
+            zoomFactor: 3,
+            lensSize: 200,
+            borderWidth: 3,
+            borderColor: '#fff',
+            shadowBlur: 20,
+            shadowColor: 'rgba(0, 0, 0, 0.3)'
+        });
 
         this.answerValidator.setCurrentImage(image.id, forceDisable);
 
@@ -56,7 +72,7 @@ class ImageNavigator {
 
 
         this.elements.prevBtn.disabled = this.currentIndex === 0;
-        this.elements.nextBtn.disabled = this.currentIndex === this.images.length - 1 || forceDisable;
+        this.answerValidator.updateNextButtonState();
     }
 
     disableNavigation() {
