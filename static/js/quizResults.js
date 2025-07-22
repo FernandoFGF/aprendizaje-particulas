@@ -1,7 +1,10 @@
 class QuizResults {
-    constructor(userAnswers, images) {
+    constructor(userAnswers, images, showInteraction, showFlavor, showMode) {
         this.userAnswers = userAnswers;
         this.images = images;
+        this.showInteraction = showInteraction;
+        this.showFlavor = showFlavor;
+        this.showMode = showMode;
         this.correctAnswers = this.getCorrectAnswers();
         this.results = this.calculateResults();
     }
@@ -80,15 +83,27 @@ class QuizResults {
     }
 
     isAnswerCorrect(userAnswer, correctAnswer) {
-        return userAnswer.interaction_type === correctAnswer.interaction_type &&
-               userAnswer.flavor === correctAnswer.flavor &&
-               userAnswer.interaction_mode === correctAnswer.interaction_mode;
+        let correct = true;
+
+        if (this.showInteraction) {
+            correct = correct && (userAnswer.interaction_type === correctAnswer.interaction_type);
+        }
+
+        if (this.showFlavor) {
+            correct = correct && (userAnswer.flavor === correctAnswer.flavor);
+        }
+
+        if (this.showMode) {
+            correct = correct && (userAnswer.interaction_mode === correctAnswer.interaction_mode);
+        }
+
+        return correct;
     }
 
     getAnswerDetails(userAnswer, correctAnswer) {
         const details = [];
 
-        if (userAnswer.interaction_type !== correctAnswer.interaction_type) {
+        if (this.showInteraction && userAnswer.interaction_type !== correctAnswer.interaction_type) {
             details.push({
                 category: 'Tipo de interacción',
                 userAnswer: userAnswer.interaction_type || 'No respondido',
@@ -97,7 +112,7 @@ class QuizResults {
             });
         }
 
-        if (userAnswer.flavor !== correctAnswer.flavor) {
+        if (this.showFlavor && userAnswer.flavor !== correctAnswer.flavor) {
             details.push({
                 category: 'Sabor',
                 userAnswer: userAnswer.flavor || 'No respondido',
@@ -106,7 +121,7 @@ class QuizResults {
             });
         }
 
-        if (userAnswer.interaction_mode !== correctAnswer.interaction_mode) {
+        if (this.showMode && userAnswer.interaction_mode !== correctAnswer.interaction_mode) {
             details.push({
                 category: 'Modo de interacción',
                 userAnswer: userAnswer.interaction_mode || 'No respondido',
@@ -121,7 +136,80 @@ class QuizResults {
     generateResultsHTML() {
         const { questions, correctCount, totalQuestions, percentage } = this.results;
 
-        let html = `
+        const questionHTML = questions.map(question => {
+            const isCorrect = question.isCorrect;
+            const statusIcon = isCorrect ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger';
+            const statusText = isCorrect ? 'Correcto' : 'Incorrecto';
+            const statusClass = isCorrect ? 'border-success' : 'border-danger';
+
+            const interactionTemplate = this.showInteraction ? `
+                <div class="p-2 ${this.getAnswerClass('interaction_type', question)} rounded mb-2">
+                    <small><strong>Tipo:</strong> ${question.correctAnswers.interaction_type}</small>
+                </div>
+            ` : '';
+
+            const flavorTemplate = this.showFlavor ? `
+                <div class="p-2 ${this.getAnswerClass('flavor', question)} rounded mb-2">
+                    <small><strong>Sabor:</strong> ${question.correctAnswers.flavor}</small>
+                </div>
+            ` : '';
+
+            const modeTemplate = this.showMode ? `
+                <div class="p-2 ${this.getAnswerClass('interaction_mode', question)} rounded">
+                    <small><strong>Modo:</strong> ${question.correctAnswers.interaction_mode}</small>
+                </div>
+            ` : '';
+
+            return `
+                <div class="question-result mb-4 p-3 border ${statusClass} rounded">
+                    <div class="d-flex align-items-center mb-3">
+                        <h5 class="mb-0 me-3">${question.questionNumber}. ¿Qué tipo de partícula se muestra en la imagen?</h5>
+                        <span class="badge ${isCorrect ? 'bg-success' : 'bg-danger'} fs-6">
+                            <i class="${statusIcon} me-1"></i>${statusText}
+                        </span>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/imagen_externa/${encodeURIComponent(question.image.path)}" 
+                                alt="Imagen de partícula" class="img-fluid rounded border">
+                        </div>
+                        <div class="col-md-9">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Tu respuesta:</h6>
+                                    ${this.showInteraction ? `
+                                    <div class="p-2 bg-light rounded mb-2">
+                                        <small><strong>Tipo:</strong> ${this.formatAnswer(question.userAnswers.interaction_type)}</small>
+                                    </div>
+                                    ` : ''}
+                                    ${this.showFlavor ? `
+                                    <div class="p-2 bg-light rounded mb-2">
+                                        <small><strong>Sabor:</strong> ${this.formatAnswer(question.userAnswers.flavor)}</small>
+                                    </div>
+                                    ` : ''}
+                                    ${this.showMode ? `
+                                    <div class="p-2 bg-light rounded">
+                                        <small><strong>Modo:</strong> ${this.formatAnswer(question.userAnswers.interaction_mode)}</small>
+                                    </div>
+                                    ` : ''}
+                                </div>
+                                <div class="col-md-6">
+                                    <h6 class="text-muted mb-2">Respuesta correcta:</h6>
+                                    ${interactionTemplate}
+                                    ${flavorTemplate}
+                                    ${modeTemplate}
+                                </div>
+                            </div>
+                    
+                            ${!isCorrect ? this.generateIncorrectMessage(question) : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        return `
             <div class="container py-4">
                 <div class="card shadow">
                     <div class="card-header bg-primary text-white">
@@ -132,64 +220,7 @@ class QuizResults {
                             <h3 class="mb-2">${percentage}%</h3>
                             <p class="mb-0 fs-5">${correctCount} de ${totalQuestions} correctas</p>
                         </div>
-        `;
-
-        questions.forEach((question, index) => {
-            const isCorrect = question.isCorrect;
-            const statusIcon = isCorrect ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger';
-            const statusText = isCorrect ? 'Correcto' : 'Incorrecto';
-            const statusClass = isCorrect ? 'border-success' : 'border-danger';
-
-            html += `
-                <div class="question-result mb-4 p-3 border ${statusClass} rounded">
-                    <div class="d-flex align-items-center mb-3">
-                        <h5 class="mb-0 me-3">${question.questionNumber}. ¿Qué tipo de partícula se muestra en la imagen?</h5>
-                        <span class="badge ${isCorrect ? 'bg-success' : 'bg-danger'} fs-6">
-                            <i class="${statusIcon} me-1"></i>${statusText}
-                        </span>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="/imagen_externa/${encodeURIComponent(question.image.path)}" 
-                                 alt="Imagen de partícula" class="img-fluid rounded border">
-                        </div>
-                        <div class="col-md-9">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6 class="text-muted mb-2">Tu respuesta:</h6>
-                                    <div class="p-2 bg-light rounded mb-2">
-                                        <small><strong>Tipo:</strong> ${this.formatAnswer(question.userAnswers.interaction_type)}</small>
-                                    </div>
-                                    <div class="p-2 bg-light rounded mb-2">
-                                        <small><strong>Sabor:</strong> ${this.formatAnswer(question.userAnswers.flavor)}</small>
-                                    </div>
-                                    <div class="p-2 bg-light rounded">
-                                        <small><strong>Modo:</strong> ${this.formatAnswer(question.userAnswers.interaction_mode)}</small>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6 class="text-muted mb-2">Respuesta correcta:</h6>
-                                    <div class="p-2 ${this.getAnswerClass('interaction_type', question)} rounded mb-2">
-                                        <small><strong>Tipo:</strong> ${question.correctAnswers.interaction_type}</small>
-                                    </div>
-                                    <div class="p-2 ${this.getAnswerClass('flavor', question)} rounded mb-2">
-                                        <small><strong>Sabor:</strong> ${question.correctAnswers.flavor}</small>
-                                    </div>
-                                    <div class="p-2 ${this.getAnswerClass('interaction_mode', question)} rounded">
-                                        <small><strong>Modo:</strong> ${question.correctAnswers.interaction_mode}</small>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            ${!isCorrect ? this.generateIncorrectMessage(question) : ''}
-                        </div>
-                    </div>
-                </div>
-            `;
-        });
-
-        html += `
+                        ${questionHTML}
                         <div class="text-center mt-4">
                             <button onclick="location.href='/'" class="btn btn-primary btn-lg">
                                 <i class="fas fa-redo me-2"></i>Realizar otro quiz
@@ -199,8 +230,6 @@ class QuizResults {
                 </div>
             </div>
         `;
-
-        return html;
     }
 
     formatAnswer(answer) {
@@ -221,15 +250,15 @@ class QuizResults {
     generateIncorrectMessage(question) {
         const incorrectDetails = [];
 
-        if (question.userAnswers.interaction_type !== question.correctAnswers.interaction_type) {
+        if (this.showInteraction && question.userAnswers.interaction_type !== question.correctAnswers.interaction_type) {
             incorrectDetails.push(`Tipo de interacción: respondiste "${this.formatAnswer(question.userAnswers.interaction_type)}", la respuesta correcta es "${question.correctAnswers.interaction_type}"`);
         }
 
-        if (question.userAnswers.flavor !== question.correctAnswers.flavor) {
+        if (this.showFlavor && question.userAnswers.flavor !== question.correctAnswers.flavor) {
             incorrectDetails.push(`Sabor: respondiste "${this.formatAnswer(question.userAnswers.flavor)}", la respuesta correcta es "${question.correctAnswers.flavor}"`);
         }
 
-        if (question.userAnswers.interaction_mode !== question.correctAnswers.interaction_mode) {
+        if (this.showMode && question.userAnswers.interaction_mode !== question.correctAnswers.interaction_mode) {
             incorrectDetails.push(`Modo de interacción: respondiste "${this.formatAnswer(question.userAnswers.interaction_mode)}", la respuesta correcta es "${question.correctAnswers.interaction_mode}"`);
         }
 
