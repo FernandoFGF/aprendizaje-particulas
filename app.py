@@ -1,8 +1,8 @@
 import os
 
-from flask import Flask, render_template, send_from_directory, request
+from flask import Flask, render_template, send_from_directory, request, make_response
 from particula_db.particle_dao import ParticleDAO
-from particula_db.particle_image import Particle
+
 
 app = Flask(__name__)
 
@@ -30,19 +30,30 @@ def exercise():
     interaction = request.args.get('interaction', 'true') == 'true'
     flavor = request.args.get('flavor', 'true') == 'true'
     mode = request.args.get('mode', 'true') == 'true'
+    count = request.args.get('count', '5')
 
-    filtered_images = ParticleDAO.get_filtered_images(show_interaction=interaction,
-                                                         show_flavor=flavor,
-                                                         show_mode=mode)
+    filtered_images = ParticleDAO.get_filtered_images(
+        show_interaction=interaction,
+        show_flavor=flavor,
+        show_mode=mode,
+        count=count
+    )
 
-    return render_template('exercise.html',
-                           current_image=filtered_images[0] if filtered_images else None,
-                           all_images=filtered_images,
-                           current_index=0,
-                           show_interaction=interaction,
-                           show_flavor=flavor,
-                           show_mode=mode)
+    response = make_response(render_template(
+        'exercise.html',
+        current_image=filtered_images[0] if filtered_images else None,
+        all_images=filtered_images,
+        current_index=0,
+        show_interaction=interaction,
+        show_flavor=flavor,
+        show_mode=mode
+    ))
 
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+
+    return response
 
 if __name__ == '__main__':
     app.run(use_debugger=False, use_reloader=False)

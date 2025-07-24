@@ -1,5 +1,7 @@
 from particula_db.connection import Connection
 from particula_db.particle_image import Particle
+import random
+import time
 
 
 class ParticleDAO:
@@ -85,9 +87,26 @@ class ParticleDAO:
                 Connection.release_connection(connection)
 
     @classmethod
-    def get_filtered_images(cls, show_interaction=True, show_flavor=True, show_mode=True):
+    def get_filtered_images(cls, show_interaction=True, show_flavor=True, show_mode=True, count='5'):
         connection = None
         try:
+            id_query = "SELECT id FROM particula_imagen"
+            connection = Connection.get_connection()
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute(id_query)
+            all_ids = [str(row['id']) for row in cursor.fetchall()]
+
+            if not all_ids:
+                return []
+
+            random.seed(time.time())
+            random.shuffle(all_ids)
+
+            try:
+                all_ids = all_ids[:int(count)]
+            except ValueError:
+                pass
+
             # Construir consulta dinámica
             fields = ['id', 'path']
             if show_interaction:
@@ -97,10 +116,11 @@ class ParticleDAO:
             if show_mode:
                 fields.append('modo_interaccion')
 
-            query = f'SELECT {",".join(fields)} FROM particula_imagen ORDER BY id'
+            query = f"""SELECT {','.join(fields)}
+                        FROM particula_imagen
+                        WHERE id IN ({','.join(all_ids)})
+                        ORDER BY FIELD(id, {','.join(all_ids)})"""
 
-            connection = Connection.get_connection()
-            cursor = connection.cursor(dictionary=True)
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:
