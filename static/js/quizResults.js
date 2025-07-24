@@ -212,11 +212,11 @@ class QuizResults {
         return `
             <div class="container py-4">
                 <div class="card shadow">
-                    <div class="card-header bg-primary text-white">
+                    <div class="card-header bg-secondary text-white">
                         <h2 class="mb-0"><i class="fas fa-chart-bar me-2"></i>Resultados del Quiz</h2>
                     </div>
                     <div class="card-body">
-                        <div class="alert alert-info mb-4 text-center">
+                        <div class="alert bg-secondary mb-4 text-white text-center">
                             <h3 class="mb-2">${percentage}%</h3>
                             <p class="mb-0 fs-5">${correctCount} de ${totalQuestions} correctas</p>
                         </div>
