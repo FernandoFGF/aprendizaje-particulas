@@ -131,6 +131,23 @@ class ParticleDAO:
                 cursor.close()
                 Connection.release_connection(connection)
 
+    @classmethod
+    def get_all_particles(cls):
+        connection = None
+        try:
+            connection = Connection.get_connection()
+            cursor = connection.cursor(dictionary=True)
+            query = "SELECT id, path, tipo_interaccion, sabor, modo_interaccion FROM particula_imagen ORDER BY id"
+            cursor.execute(query)
+            return cursor.fetchall()
+        except Exception as e:
+            print(f'Error loading all particles: {e}')
+            return []
+        finally:
+            if connection is not None:
+                cursor.close()
+                Connection.release_connection(connection)
+
 
 if __name__ == '__main__':
     # Seleccionar los clientes

@@ -14,7 +14,13 @@ function setupIndexFilters() {
         window.location.href = `/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&count=${count}&_=${timestamp}`;
     }
 
+    function handleLearnButton() {
+        const timestamp = Date.now();
+        window.location.href = `/learn.html?_=${timestamp}`;
+    }
+
     document.getElementById('start-btn').addEventListener('click', handleStartButton);
+    document.getElementById('learn-btn').addEventListener('click', handleLearnButton);
 }
 
 document.addEventListener('DOMContentLoaded', setupIndexFilters);

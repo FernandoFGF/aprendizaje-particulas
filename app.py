@@ -55,5 +55,23 @@ def exercise():
 
     return response
 
+
+@app.route('/learn.html')
+def learn():
+    # Obtener todas las partículas para el modo aprender
+    all_particles = ParticleDAO.get_all_particles()
+
+    response = make_response(render_template(
+        'learn.html',
+        particles=all_particles
+    ))
+
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+
+    return response
+
+
 if __name__ == '__main__':
     app.run(use_debugger=False, use_reloader=False)
