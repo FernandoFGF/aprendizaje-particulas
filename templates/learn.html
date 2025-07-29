@@ -160,8 +160,8 @@
                     <!-- Image container -->
                     <div class="image-original-container mb-3 text-center" style="position: relative;">
 
-                        <img src="{{ url_for('serve_external_image', filename=particles[0].path) }}"
-                             data-zoom="{{ url_for('serve_external_image', filename=particles[0].path) }}"
+                        <img src="{{ url_for('serve_external_image', filename=particles[0].image_path) }}"
+                             data-zoom="{{ url_for('serve_external_image', filename=particles[0].image_path) }}"
                              alt="Imagen de partícula"
                              class="img-fluid"
                              id="zoom-image">

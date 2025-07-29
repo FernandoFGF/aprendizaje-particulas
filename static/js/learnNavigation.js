@@ -91,13 +91,13 @@ class LearnNavigator {
         };
 
         if (this.elements.interactionType) {
-            this.elements.interactionType.textContent = interactionTypeMap[particle.tipo_interaccion] || 'Desconocido';
+            this.elements.interactionType.textContent = interactionTypeMap[particle.interaction_type] || 'Desconocido';
         }
         if (this.elements.flavor) {
-            this.elements.flavor.textContent = flavorMap[particle.sabor] || 'Desconocido';
+            this.elements.flavor.textContent = flavorMap[particle.flavor] || 'Desconocido';
         }
         if (this.elements.interactionMode) {
-            this.elements.interactionMode.textContent = interactionModeMap[particle.modo_interaccion] || 'Desconocido';
+            this.elements.interactionMode.textContent = interactionModeMap[particle.interaction_mode] || 'Desconocido';
         }
     }
 
@@ -110,8 +110,8 @@ class LearnNavigator {
         const particle = this.particles[this.currentIndex];
 
         if (this.elements.zoomImage) {
-            this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(particle.path)}`;
-            this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(particle.path)}`;
+            this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(particle.image_path)}`;
+            this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(particle.image_path)}`;
 
             if (this.zoomInstance) {
                 this.zoomInstance.destroy();

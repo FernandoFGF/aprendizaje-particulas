@@ -1,14 +1,14 @@
-from particula_db.connection import Connection
-from particula_db.particle_image import Particle
+from particles_testing_db.connection import Connection
+from particles_testing_db.particle_image import Particle
 import random
 import time
 
 
 class ParticleDAO:
-    SELECT_ALL = 'SELECT * FROM particula_imagen ORDER BY id'
-    INSERT = 'INSERT INTO particula_imagen(path, tipo_interaccion, sabor, modo_interaccion) VALUES(%s, %s, %s, %s)'
-    UPDATE = 'UPDATE particula_imagen SET path=%s, tipo_interaccion=%s, sabor=%s, modo_interaccion=%s WHERE id=%s'
-    DELETE = 'DELETE FROM particula_imagen WHERE id=%s'
+    SELECT_ALL = 'SELECT * FROM particle_quizzes ORDER BY id'
+    INSERT = 'INSERT INTO particle_quizzes(image_path, interaction_type, flavor, interaction_mode) VALUES(%s, %s, %s, %s)'
+    UPDATE = 'UPDATE particle_quizzes SET image_path=%s, interaction_type=%s, flavor=%s, interaction_mode=%s WHERE id=%s'
+    DELETE = 'DELETE FROM particle_quizzes WHERE id=%s'
 
     @classmethod
     def get_all(cls):
@@ -18,7 +18,7 @@ class ParticleDAO:
             cursor = connection.cursor()
             cursor.execute(cls.SELECT_ALL)
             records = cursor.fetchall()
-            # Mapeo de clase-tabla particula_imagen
+            # Mapeo de clase-tabla particle_quizzes
             particles = []
             for record in records:
                 particle = Particle(record[0], record[1], record[2], record[3], record[4])
@@ -37,7 +37,7 @@ class ParticleDAO:
         try:
             conection = Connection.get_connection()
             cursor = conection.cursor()
-            values = (particle.path, particle.interaction_type,
+            values = (particle.image_path, particle.interaction_type,
                        particle.flavor, particle.interaction_mode)
             cursor.execute(cls.INSERT, values)
             conection.commit()
@@ -56,7 +56,7 @@ class ParticleDAO:
         try:
             connection = Connection.get_connection()
             cursor = connection.cursor()
-            values = (particle.path, particle.interaction_type,
+            values = (particle.image_path, particle.interaction_type,
                        particle.flavor, particle.interaction_mode,
                        particle.id)
             cursor.execute(cls.UPDATE, values)
@@ -90,7 +90,7 @@ class ParticleDAO:
     def get_filtered_images(cls, show_interaction=True, show_flavor=True, show_mode=True, count='5'):
         connection = None
         try:
-            id_query = "SELECT id FROM particula_imagen"
+            id_query = "SELECT id FROM particle_quizzes"
             connection = Connection.get_connection()
             cursor = connection.cursor(dictionary=True)
             cursor.execute(id_query)
@@ -108,16 +108,16 @@ class ParticleDAO:
                 pass
 
             # Construir consulta dinámica
-            fields = ['id', 'path']
+            fields = ['id', 'image_path']
             if show_interaction:
-                fields.append('tipo_interaccion')
+                fields.append('interaction_type')
             if show_flavor:
-                fields.append('sabor')
+                fields.append('flavor')
             if show_mode:
-                fields.append('modo_interaccion')
+                fields.append('interaction_mode')
 
             query = f"""SELECT {','.join(fields)}
-                        FROM particula_imagen
+                        FROM particle_quizzes
                         WHERE id IN ({','.join(all_ids)})
                         ORDER BY FIELD(id, {','.join(all_ids)})"""
 
@@ -137,7 +137,7 @@ class ParticleDAO:
         try:
             connection = Connection.get_connection()
             cursor = connection.cursor(dictionary=True)
-            query = "SELECT id, path, tipo_interaccion, sabor, modo_interaccion FROM particula_imagen ORDER BY id"
+            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode FROM particle_quizzes ORDER BY id"
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:

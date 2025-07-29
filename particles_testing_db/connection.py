@@ -3,7 +3,7 @@ from mysql.connector import Error
 
 
 class Connection:
-    DATABASE = 'particulas_db'
+    DATABASE = 'particles_testing_db'
     USERNAME = 'root'
     PASSWORD = 'neutrino'
     DB_PORT = '3306'

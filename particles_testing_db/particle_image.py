@@ -1,13 +1,13 @@
 class Particle:
-    def __init__(self, id=None, path=None, interaction_type=None, flavor=None, interaction_mode=None):
+    def __init__(self, id=None, image_path=None, interaction_type=None, flavor=None, interaction_mode=None):
         self.id = id
-        self.path = path
+        self.image_path = image_path
         self.interaction_type = interaction_type
         self.flavor = flavor
         self.interaction_mode = interaction_mode
 
     def __str__(self):
-        return (f'Id: {self.id}, Path: {self.path}, '
+        return (f'Id: {self.id}, Path: {self.image_path}, '
                 f'Tipo interacción: {self.interaction_type}, Sabor: {self.flavor}, '
                 f'Modo interacción: {self.interaction_mode}')
 

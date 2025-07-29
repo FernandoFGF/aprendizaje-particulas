@@ -1,7 +1,7 @@
 import os
 
 from flask import Flask, render_template, send_from_directory, request, make_response
-from particula_db.particle_dao import ParticleDAO
+from particles_testing_db.particle_dao import ParticleDAO
 
 
 app = Flask(__name__)

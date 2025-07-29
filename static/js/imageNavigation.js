@@ -47,8 +47,8 @@ class ImageNavigator {
 
         const image = this.images[this.currentIndex];
         const imgElement = this.elements.zoomImage;
-        this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(image.path)}`;
-        this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(image.path)}`;
+        this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
+        this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
         this.elements.questionNumber.textContent = this.currentIndex + 1;
         this.elements.totalQuestions.textContent = this.images.length;
 

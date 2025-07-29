@@ -14,9 +14,9 @@ class QuizResults {
 
         this.images.forEach(image => {
             correctAnswers[image.id] = {
-                interaction_type: this.mapInteractionType(image.tipo_interaccion),
-                flavor: this.mapFlavor(image.sabor),
-                interaction_mode: this.mapInteractionMode(image.modo_interaccion)
+                interaction_type: this.mapInteractionType(image.interaction_type),
+                flavor: this.mapFlavor(image.flavor),
+                interaction_mode: this.mapInteractionMode(image.interaction_mode)
             };
         });
 
@@ -171,7 +171,7 @@ class QuizResults {
             
                     <div class="row">
                         <div class="col-md-3">
-                            <img src="/imagen_externa/${encodeURIComponent(question.image.path)}" 
+                            <img src="/imagen_externa/${encodeURIComponent(question.image.image_path)}" 
                                 alt="Imagen de partícula" class="img-fluid rounded border">
                         </div>
                         <div class="col-md-9">
