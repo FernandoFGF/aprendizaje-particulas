@@ -6,10 +6,7 @@ class AnswerValidator {
             'interaction-section',
             'flavor-section',
             'mode-section',
-            'hi-section',
-            'li-section',
-            'photon-section',
-            'electron-section'
+            'particles-section'
         ];
         this.initEventListeners();
     }
@@ -22,12 +19,15 @@ class AnswerValidator {
             });
         });
 
-        document.querySelectorAll('select').forEach(select => {
-            select.addEventListener('change', (e) => {
-                this.handleAnswerChange(e);
-                this.updateNextButtonState();
+        const particlesSection = document.getElementById('particles-section');
+        if (particlesSection) {
+            particlesSection.querySelectorAll('select').forEach(select => {
+                select.addEventListener('change', (e) => {
+                    this.handleAnswerChange(e);
+                    this.updateNextButtonState();
+                });
             });
-        });
+        }
     }
 
     handleAnswerChange(event) {
@@ -51,19 +51,18 @@ class AnswerValidator {
             const section = document.getElementById(sectionId);
             if (!section || section.classList.contains('hidden')) return true;
 
-            const radioName = section.querySelector('input[type="radio"]')?.name;
-            if (radioName) {
+            if (sectionId !== 'particles-section') {
+                const radioName = section.querySelector('input[type="radio"]')?.name;
                 return section.querySelector('input[type="radio"]:checked') !== null ||
-                    (this.userAnswers[this.currentImageId]?.[radioName] !== undefined);
+                       (this.userAnswers[this.currentImageId]?.[radioName] !== undefined);
             }
-
-            const select = section.querySelector('select');
-            if (select) {
-                return select.value !== '' ||
-                    (this.userAnswers[this.currentImageId]?.[select.name] !== undefined);
+            else {
+                const selects = section.querySelectorAll('select');
+                return Array.from(selects).every(select => {
+                    return select.value !== '' ||
+                           (this.userAnswers[this.currentImageId]?.[select.name] !== undefined);
+                });
             }
-
-            return false;
         });
 
         nextBtn.disabled = !allAnswered;
@@ -185,9 +184,12 @@ class AnswerValidator {
     }
 
     resetSelectSelections(){
-        document.querySelectorAll('select').forEach(select => {
-            select.value = '';
-        });
+        const particlesSection = document.getElementById('particles-section');
+        if (particlesSection) {
+            particlesSection.querySelectorAll('select').forEach(select => {
+                select.value = '';
+            });
+        }
     }
 
     resetAllSelections() {
@@ -200,8 +202,10 @@ class AnswerValidator {
 
         let allRestored = true;
         document.querySelectorAll('.classification-section:not(.hidden)').forEach(section => {
-            if (section.querySelector('input[type="radio"]')) {
-                const radioName = section.querySelector('input[type="radio"]')?.name;
+            // Para radios
+            const radios = section.querySelectorAll('input[type="radio"]');
+            if (radios.length > 0) {
+                const radioName = radios[0].name;
                 if (radioName && this.userAnswers[this.currentImageId][radioName]) {
                     const radio = document.querySelector(`input[name="${radioName}"][value="${this.userAnswers[this.currentImageId][radioName]}"]`);
                     if (radio) {
@@ -209,21 +213,18 @@ class AnswerValidator {
                     } else {
                         allRestored = false;
                     }
-                } else {
-                    allRestored = false;
                 }
-            } else if (section.querySelector('select')) {
-                const selectName = section.querySelector('select')?.name;
-                if (selectName && this.userAnswers[this.currentImageId][selectName] !== undefined) {
-                    const select = document.querySelector(`select[name="${selectName}"]`);
-                    if (select) {
+            }
+            else {
+                const selects = section.querySelectorAll('select');
+                selects.forEach(select => {
+                    const selectName = select.name;
+                    if (selectName && this.userAnswers[this.currentImageId][selectName] !== undefined) {
                         select.value = this.userAnswers[this.currentImageId][selectName];
                     } else {
                         allRestored = false;
                     }
-                } else {
-                    allRestored = false;
-                }
+                });
             }
         });
 
