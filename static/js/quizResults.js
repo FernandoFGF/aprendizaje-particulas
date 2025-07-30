@@ -54,91 +54,126 @@ class QuizResults {
 
     calculateResults() {
         const results = [];
-        let correctCount = 0;
-        let totalQuestions = 0;
+        let totalScore = 0;
+        let maxPossibleScore = 0;
 
         this.images.forEach((image, index) => {
             const imageId = image.id;
             const userAnswer = this.userAnswers[imageId] || {};
             const correctAnswer = this.correctAnswers[imageId];
 
+            let imageScore = 0;
+            let imageMaxScore = 0;
+
+
+            const weights = {
+                interaction: 0.25,
+                flavor: 0.25,
+                mode: 0.25,
+                particles: 0.25
+            };
+
+            if (this.showInteraction) {
+                imageMaxScore += weights.interaction;
+                if (userAnswer.interaction_type === correctAnswer.interaction_type) {
+                    imageScore += weights.interaction;
+                }
+            }
+
+            if (this.showFlavor) {
+                imageMaxScore += weights.flavor;
+                if (userAnswer.flavor === correctAnswer.flavor) {
+                    imageScore += weights.flavor;
+                }
+            }
+
+            if (this.showMode) {
+                imageMaxScore += weights.mode;
+                if (userAnswer.interaction_mode === correctAnswer.interaction_mode) {
+                    imageScore += weights.mode;
+                }
+            }
+
+            if (this.showParticles) {
+                const particleWeight = weights.particles / 4;
+
+                imageMaxScore += particleWeight;
+                if (userAnswer.hi_tracks === correctAnswer.hi_tracks) {
+                    imageScore += particleWeight;
+                }
+
+                imageMaxScore += particleWeight;
+                if (userAnswer.li_tracks === correctAnswer.li_tracks) {
+                    imageScore += particleWeight;
+                }
+
+                imageMaxScore += particleWeight;
+                if (userAnswer.photon_showers === correctAnswer.photon_showers) {
+                    imageScore += particleWeight;
+                }
+
+                imageMaxScore += particleWeight;
+                if (userAnswer.electron_showers === correctAnswer.electron_showers) {
+                    imageScore += particleWeight;
+                }
+            }
+
             const questionResult = {
                 questionNumber: index + 1,
                 image: image,
                 userAnswers: userAnswer,
                 correctAnswers: correctAnswer,
-                isCorrect: this.isAnswerCorrect(userAnswer, correctAnswer),
+                score: imageScore,
+                maxScore: imageMaxScore,
                 details: this.getAnswerDetails(userAnswer, correctAnswer)
             };
 
             results.push(questionResult);
-
-            if (questionResult.isCorrect) {
-                correctCount++;
-            }
-            totalQuestions++;
+            totalScore += imageScore;
+            maxPossibleScore += imageMaxScore;
         });
 
         return {
             questions: results,
-            correctCount: correctCount,
-            totalQuestions: totalQuestions,
-            percentage: Math.round((correctCount / totalQuestions) * 100)
+            totalScore: totalScore,
+            maxPossibleScore: maxPossibleScore,
+            percentage: Math.round((totalScore / maxPossibleScore) * 100) || 0
         };
-    }
-
-    isAnswerCorrect(userAnswer, correctAnswer) {
-        let correct = true;
-
-        if (this.showInteraction) {
-            correct = correct && (userAnswer.interaction_type === correctAnswer.interaction_type);
-        }
-
-        if (this.showFlavor) {
-            correct = correct && (userAnswer.flavor === correctAnswer.flavor);
-        }
-
-        if (this.showMode) {
-            correct = correct && (userAnswer.interaction_mode === correctAnswer.interaction_mode);
-        }
-
-        if (this.showParticles) {
-            correct = correct && (userAnswer.hi_tracks === correctAnswer.hi_tracks) &&
-                      (userAnswer.li_tracks === correctAnswer.li_tracks) &&
-                      (userAnswer.photon_showers === correctAnswer.photon_showers) &&
-                      (userAnswer.electron_showers === correctAnswer.electron_showers);
-        }
-
-        return correct;
     }
 
     getAnswerDetails(userAnswer, correctAnswer) {
         const details = [];
+        const weights = {
+            interaction: 25,
+            flavor: 25,
+            mode: 25,
+            particles: 6.25
+        };
 
         if (this.showInteraction && userAnswer.interaction_type !== correctAnswer.interaction_type) {
             details.push({
                 category: 'Tipo de interacción',
+                weight: weights.interaction,
                 userAnswer: userAnswer.interaction_type || 'No respondido',
-                correctAnswer: correctAnswer.interaction_type,
-                isCorrect: false
+                correctAnswer: correctAnswer.interaction_type
             });
         }
 
         if (this.showFlavor && userAnswer.flavor !== correctAnswer.flavor) {
             details.push({
                 category: 'Sabor',
+                weight: weights.flavor,
                 userAnswer: userAnswer.flavor || 'No respondido',
-                correctAnswer: correctAnswer.flavor,
-                isCorrect: false
+                correctAnswer: correctAnswer.flavor
             });
         }
 
         if (this.showMode && userAnswer.interaction_mode !== correctAnswer.interaction_mode) {
             details.push({
                 category: 'Modo de interacción',
+                weight: weights.mode,
                 userAnswer: userAnswer.interaction_mode || 'No respondido',
-                correctAnswer: correctAnswer.interaction_mode,
-                isCorrect: false
+                correctAnswer: correctAnswer.interaction_mode
             });
         }
 
@@ -146,33 +181,33 @@ class QuizResults {
             if (userAnswer.hi_tracks !== correctAnswer.hi_tracks) {
                 details.push({
                     category: 'Trazas HI',
+                    weight: weights.particles,
                     userAnswer: userAnswer.hi_tracks || 'No respondido',
-                    correctAnswer: correctAnswer.hi_tracks,
-                    isCorrect: false
+                    correctAnswer: correctAnswer.hi_tracks
                 });
             }
             if (userAnswer.li_tracks !== correctAnswer.li_tracks) {
                 details.push({
                     category: 'Trazas LI',
+                    weight: weights.particles,
                     userAnswer: userAnswer.li_tracks || 'No respondido',
-                    correctAnswer: correctAnswer.li_tracks,
-                    isCorrect: false
+                    correctAnswer: correctAnswer.li_tracks
                 });
             }
             if (userAnswer.photon_showers !== correctAnswer.photon_showers) {
                 details.push({
-                    category: 'Cascadas Fotón',
+                    category: 'Cascadas Electrón',
+                    weight: weights.particles,
                     userAnswer: userAnswer.photon_showers || 'No respondido',
-                    correctAnswer: correctAnswer.photon_showers,
-                    isCorrect: false
+                    correctAnswer: correctAnswer.photon_showers
                 });
             }
             if (userAnswer.electron_showers !== correctAnswer.electron_showers) {
                 details.push({
                     category: 'Cascadas Electrón',
+                    weight: weights.particles,
                     userAnswer: userAnswer.electron_showers || 'No respondido',
-                    correctAnswer: correctAnswer.electron_showers,
-                    isCorrect: false
+                    correctAnswer: correctAnswer.electron_showers
                 });
             }
         }
@@ -181,13 +216,17 @@ class QuizResults {
     }
 
     generateResultsHTML() {
-        const { questions, correctCount, totalQuestions, percentage } = this.results;
+        const { questions, totalScore, maxPossibleScore, percentage } = this.calculateResults();
+
+        const fullyCorrectCount = questions.filter(q => (q.score / q.maxScore) > 0.99).length;
+        const totalQuestions = questions.length;
 
         const questionHTML = questions.map(question => {
-            const isCorrect = question.isCorrect;
-            const statusIcon = isCorrect ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger';
-            const statusText = isCorrect ? 'Correcto' : 'Incorrecto';
-            const statusClass = isCorrect ? 'border-success' : 'border-danger';
+            const isFullyCorrect = (question.score / question.maxScore) > 0.99;
+            const statusIcon = isFullyCorrect ? 'fas fa-check-circle text-success' : 'fas fa-times-circle text-danger';
+            const statusText = isFullyCorrect ? 'Correcto' : 'Incorrecto';
+            const statusClass = isFullyCorrect ? 'border-success' : 'border-danger';
+            const partialScore = Math.round((question.score / question.maxScore) * 100);
 
             const interactionTemplate = this.showInteraction ? `
                 <div class="p-2 ${this.getAnswerClass('interaction_type', question)} rounded mb-2">
@@ -226,8 +265,8 @@ class QuizResults {
                 <div class="question-result mb-4 p-3 border ${statusClass} rounded">
                     <div class="d-flex align-items-center mb-3">
                         <h5 class="mb-0 me-3">${question.questionNumber}. ¿Qué tipo de partícula se muestra en la imagen?</h5>
-                        <span class="badge ${isCorrect ? 'bg-success' : 'bg-danger'} fs-6">
-                            <i class="${statusIcon} me-1"></i>${statusText}
+                        <span class="badge ${isFullyCorrect ? 'bg-success' : 'bg-danger'} fs-6">
+                            <i class="${statusIcon} me-1"></i>${statusText} (${partialScore}%)
                         </span>
                     </div>
             
@@ -279,7 +318,7 @@ class QuizResults {
                                 </div>
                             </div>
                     
-                            ${!isCorrect ? this.generateIncorrectMessage(question) : ''}
+                            ${!isFullyCorrect ? this.generateIncorrectMessage(question) : ''}
                         </div>
                     </div>
                 </div>
@@ -295,7 +334,7 @@ class QuizResults {
                     <div class="card-body">
                         <div class="alert bg-secondary mb-4 text-white text-center">
                             <h3 class="mb-2">${percentage}%</h3>
-                            <p class="mb-0 fs-5">${correctCount} de ${totalQuestions} correctas</p>
+                            <p class="mb-0 fs-5">${fullyCorrectCount} de ${totalQuestions} ${fullyCorrectCount === 1 ? 'correcta' : 'correctas'}</p>
                         </div>
                         ${questionHTML}
                         <div class="text-center mt-4">
@@ -328,7 +367,9 @@ class QuizResults {
     }
 
     generateIncorrectMessage(question) {
-        const incorrectDetails = [];
+        const incorrectDetails = question.details.map(detail => {
+            return `${detail.category} (${detail.weight}%): respondiste "${this.formatAnswer(detail.userAnswer)}", debería ser "${detail.correctAnswer}"`;
+        });
 
         if (this.showInteraction && question.userAnswers.interaction_type !== question.correctAnswers.interaction_type) {
             incorrectDetails.push(`Tipo de interacción: respondiste "${this.formatAnswer(question.userAnswers.interaction_type)}", la respuesta correcta es "${question.correctAnswers.interaction_type}"`);
