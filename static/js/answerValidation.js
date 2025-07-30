@@ -2,13 +2,28 @@ class AnswerValidator {
     constructor() {
         this.currentImageId = null;
         this.userAnswers = {};
-        this.requiredSections = ['interaction-section', 'flavor-section', 'mode-section'];
+        this.requiredSections = [
+            'interaction-section',
+            'flavor-section',
+            'mode-section',
+            'hi-section',
+            'li-section',
+            'photon-section',
+            'electron-section'
+        ];
         this.initEventListeners();
     }
 
     initEventListeners() {
         document.querySelectorAll('input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', (e) => {
+                this.handleAnswerChange(e);
+                this.updateNextButtonState();
+            });
+        });
+
+        document.querySelectorAll('select').forEach(select => {
+            select.addEventListener('change', (e) => {
                 this.handleAnswerChange(e);
                 this.updateNextButtonState();
             });
@@ -37,10 +52,18 @@ class AnswerValidator {
             if (!section || section.classList.contains('hidden')) return true;
 
             const radioName = section.querySelector('input[type="radio"]')?.name;
-            const hasSelection = section.querySelector('input[type="radio"]:checked') !== null;
-            const hasSavedAnswer = radioName && this.userAnswers[this.currentImageId]?.[radioName] !== undefined;
+            if (radioName) {
+                return section.querySelector('input[type="radio"]:checked') !== null ||
+                    (this.userAnswers[this.currentImageId]?.[radioName] !== undefined);
+            }
 
-            return hasSelection || hasSavedAnswer;
+            const select = section.querySelector('select');
+            if (select) {
+                return select.value !== '' ||
+                    (this.userAnswers[this.currentImageId]?.[select.name] !== undefined);
+            }
+
+            return false;
         });
 
         nextBtn.disabled = !allAnswered;
@@ -115,13 +138,26 @@ class AnswerValidator {
         const visibleSections = Array.from(document.querySelectorAll('.classification-section:not(.hidden)'));
         return visibleSections.every(section => {
             const radioName = section.querySelector('input[type="radio"]')?.name;
-            return radioName && this.userAnswers[imageId]?.[radioName] !== undefined;
+            if (radioName) {
+                return this.userAnswers[imageId]?.[radioName] !== undefined;
+            }
+
+            const selectName = section.querySelector('select')?.name;
+            if (selectName) {
+                return this.userAnswers[imageId]?.[selectName] !== undefined;
+            }
+
+            return false;
         });
     }
 
     setCurrentImage(imageId, forceDisable = false) {
+        if (this.currentImageId) {
+            this.saveCurrentAnswers();
+        }
+
         this.currentImageId = imageId;
-        this.resetRadioSelections();
+        this.resetAllSelections();
         this.restorePreviousAnswers();
 
         const nextBtn = document.getElementById('next-btn');
@@ -148,24 +184,67 @@ class AnswerValidator {
         });
     }
 
+    resetSelectSelections(){
+        document.querySelectorAll('select').forEach(select => {
+            select.value = '';
+        });
+    }
+
+    resetAllSelections() {
+        this.resetRadioSelections();
+        this.resetSelectSelections();
+    }
+
     restorePreviousAnswers() {
         if (!this.userAnswers[this.currentImageId]) return false;
 
         let allRestored = true;
         document.querySelectorAll('.classification-section:not(.hidden)').forEach(section => {
-            const radioName = section.querySelector('input[type="radio"]')?.name;
-            if (radioName && this.userAnswers[this.currentImageId][radioName]) {
-                const radio = document.querySelector(`input[name="${radioName}"][value="${this.userAnswers[this.currentImageId][radioName]}"]`);
-                if (radio) {
-                    radio.checked = true;
+            if (section.querySelector('input[type="radio"]')) {
+                const radioName = section.querySelector('input[type="radio"]')?.name;
+                if (radioName && this.userAnswers[this.currentImageId][radioName]) {
+                    const radio = document.querySelector(`input[name="${radioName}"][value="${this.userAnswers[this.currentImageId][radioName]}"]`);
+                    if (radio) {
+                        radio.checked = true;
+                    } else {
+                        allRestored = false;
+                    }
                 } else {
                     allRestored = false;
                 }
-            } else {
-                allRestored = false;
+            } else if (section.querySelector('select')) {
+                const selectName = section.querySelector('select')?.name;
+                if (selectName && this.userAnswers[this.currentImageId][selectName] !== undefined) {
+                    const select = document.querySelector(`select[name="${selectName}"]`);
+                    if (select) {
+                        select.value = this.userAnswers[this.currentImageId][selectName];
+                    } else {
+                        allRestored = false;
+                    }
+                } else {
+                    allRestored = false;
+                }
             }
         });
 
         return allRestored;
+    }
+
+    saveCurrentAnswers() {
+        if (!this.currentImageId) return;
+
+        if (!this.userAnswers[this.currentImageId]) {
+            this.userAnswers[this.currentImageId] = {};
+        }
+
+        document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+            this.userAnswers[this.currentImageId][radio.name] = radio.value;
+        });
+
+        document.querySelectorAll('select').forEach(select => {
+            if (select.value !== '') {
+                this.userAnswers[this.currentImageId][select.name] = select.value;
+            }
+        });
     }
 }

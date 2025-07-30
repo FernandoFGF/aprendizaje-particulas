@@ -8,10 +8,11 @@ function setupIndexFilters() {
         const interaction = filterInteraction.checked;
         const flavor = filterFlavor.checked;
         const mode = filterMode.checked;
+        const particles = document.getElementById('filter-particles').checked;
         const count = imageCount.value;
         const timestamp = Date.now();
 
-        window.location.href = `/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&count=${count}&_=${timestamp}`;
+        window.location.href = `/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&particles=${particles}&count=${count}&_=${timestamp}`;
     }
 
     function handleLearnButton() {

@@ -1,10 +1,11 @@
 class QuizResults {
-    constructor(userAnswers, images, showInteraction, showFlavor, showMode) {
+    constructor(userAnswers, images, showInteraction, showFlavor, showMode, showParticles) {
         this.userAnswers = userAnswers;
         this.images = images;
         this.showInteraction = showInteraction;
         this.showFlavor = showFlavor;
         this.showMode = showMode;
+        this.showParticles = showParticles;
         this.correctAnswers = this.getCorrectAnswers();
         this.results = this.calculateResults();
     }
@@ -16,7 +17,11 @@ class QuizResults {
             correctAnswers[image.id] = {
                 interaction_type: this.mapInteractionType(image.interaction_type),
                 flavor: this.mapFlavor(image.flavor),
-                interaction_mode: this.mapInteractionMode(image.interaction_mode)
+                interaction_mode: this.mapInteractionMode(image.interaction_mode),
+                hi_tracks: image.heavy_ion_track_count?.toString() || '0',
+                li_tracks: image.light_ion_track_count?.toString() || '0',
+                photon_showers: image.photon_shower_count?.toString() || '0',
+                electron_showers: image.electron_shower_count?.toString() || '0'
             };
         });
 
@@ -97,6 +102,13 @@ class QuizResults {
             correct = correct && (userAnswer.interaction_mode === correctAnswer.interaction_mode);
         }
 
+        if (this.showParticles) {
+            correct = correct && (userAnswer.hi_tracks === correctAnswer.hi_tracks) &&
+                      (userAnswer.li_tracks === correctAnswer.li_tracks) &&
+                      (userAnswer.photon_showers === correctAnswer.photon_showers) &&
+                      (userAnswer.electron_showers === correctAnswer.electron_showers);
+        }
+
         return correct;
     }
 
@@ -130,6 +142,41 @@ class QuizResults {
             });
         }
 
+        if (this.showParticles) {
+            if (userAnswer.hi_tracks !== correctAnswer.hi_tracks) {
+                details.push({
+                    category: 'Trazas HI',
+                    userAnswer: userAnswer.hi_tracks || 'No respondido',
+                    correctAnswer: correctAnswer.hi_tracks,
+                    isCorrect: false
+                });
+            }
+            if (userAnswer.li_tracks !== correctAnswer.li_tracks) {
+                details.push({
+                    category: 'Trazas LI',
+                    userAnswer: userAnswer.li_tracks || 'No respondido',
+                    correctAnswer: correctAnswer.li_tracks,
+                    isCorrect: false
+                });
+            }
+            if (userAnswer.photon_showers !== correctAnswer.photon_showers) {
+                details.push({
+                    category: 'Cascadas Fotón',
+                    userAnswer: userAnswer.photon_showers || 'No respondido',
+                    correctAnswer: correctAnswer.photon_showers,
+                    isCorrect: false
+                });
+            }
+            if (userAnswer.electron_showers !== correctAnswer.electron_showers) {
+                details.push({
+                    category: 'Cascadas Electrón',
+                    userAnswer: userAnswer.electron_showers || 'No respondido',
+                    correctAnswer: correctAnswer.electron_showers,
+                    isCorrect: false
+                });
+            }
+        }
+
         return details;
     }
 
@@ -155,8 +202,23 @@ class QuizResults {
             ` : '';
 
             const modeTemplate = this.showMode ? `
-                <div class="p-2 ${this.getAnswerClass('interaction_mode', question)} rounded">
+                <div class="p-2 ${this.getAnswerClass('interaction_mode', question)} rounded mb-2">
                     <small><strong>Modo:</strong> ${question.correctAnswers.interaction_mode}</small>
+                </div>
+            ` : '';
+
+            const particlesTemplate = this.showParticles ? `
+                <div class="p-2 ${this.getAnswerClass('hi_tracks', question)} rounded mb-2">
+                    <small><strong>Trazas HI:</strong> ${question.correctAnswers.hi_tracks}</small>
+                </div>
+                <div class="p-2 ${this.getAnswerClass('li_tracks', question)} rounded mb-2">
+                    <small><strong>Trazas LI:</strong> ${question.correctAnswers.li_tracks}</small>
+                </div>
+                <div class="p-2 ${this.getAnswerClass('photon_showers', question)} rounded mb-2">
+                    <small><strong>Cascadas Fotón:</strong> ${question.correctAnswers.photon_showers}</small>
+                </div>
+                <div class="p-2 ${this.getAnswerClass('electron_showers', question)} rounded">
+                    <small><strong>Cascadas Electrón:</strong> ${question.correctAnswers.electron_showers}</small>
                 </div>
             ` : '';
 
@@ -189,8 +251,22 @@ class QuizResults {
                                     </div>
                                     ` : ''}
                                     ${this.showMode ? `
-                                    <div class="p-2 bg-light rounded">
+                                    <div class="p-2 bg-light rounded mb-2">
                                         <small><strong>Modo:</strong> ${this.formatAnswer(question.userAnswers.interaction_mode)}</small>
+                                    </div>
+                                    ` : ''}
+                                    ${this.showParticles ? `
+                                    <div class="p-2 bg-light rounded mb-2">
+                                        <small><strong>Trazas HI:</strong> ${this.formatAnswer(question.userAnswers.hi_tracks)}</small>
+                                    </div>
+                                    <div class="p-2 bg-light rounded mb-2">
+                                        <small><strong>Trazas LI:</strong> ${this.formatAnswer(question.userAnswers.li_tracks)}</small>
+                                    </div>
+                                    <div class="p-2 bg-light rounded mb-2">
+                                        <small><strong>Cascadas Fotón:</strong> ${this.formatAnswer(question.userAnswers.photon_showers)}</small>
+                                    </div>
+                                    <div class="p-2 bg-light rounded">
+                                        <small><strong>Cascadas Electrón:</strong> ${this.formatAnswer(question.userAnswers.electron_showers)}</small>
                                     </div>
                                     ` : ''}
                                 </div>
@@ -199,6 +275,7 @@ class QuizResults {
                                     ${interactionTemplate}
                                     ${flavorTemplate}
                                     ${modeTemplate}
+                                    ${particlesTemplate}
                                 </div>
                             </div>
                     
@@ -233,7 +310,10 @@ class QuizResults {
     }
 
     formatAnswer(answer) {
-        return answer || '<span class="text-muted">No respondido</span>';
+        if (answer === undefined || answer === null || answer === '') {
+            return '<span class="text-muted">No respondido</span>';
+        }
+        return answer;
     }
 
     getAnswerClass(category, question) {
@@ -260,6 +340,21 @@ class QuizResults {
 
         if (this.showMode && question.userAnswers.interaction_mode !== question.correctAnswers.interaction_mode) {
             incorrectDetails.push(`Modo de interacción: respondiste "${this.formatAnswer(question.userAnswers.interaction_mode)}", la respuesta correcta es "${question.correctAnswers.interaction_mode}"`);
+        }
+
+        if (this.showParticles) {
+            if (question.userAnswers.hi_tracks !== question.correctAnswers.hi_tracks) {
+                incorrectDetails.push(`Trazas HI: respondiste "${this.formatAnswer(question.userAnswers.hi_tracks)}", la respuesta correcta es "${question.correctAnswers.hi_tracks}"`);
+            }
+            if (question.userAnswers.li_tracks !== question.correctAnswers.li_tracks) {
+                incorrectDetails.push(`Trazas LI: respondiste "${this.formatAnswer(question.userAnswers.li_tracks)}", la respuesta correcta es "${question.correctAnswers.li_tracks}"`);
+            }
+            if (question.userAnswers.photon_showers !== question.correctAnswers.photon_showers) {
+                incorrectDetails.push(`Cascadas Fotón: respondiste "${this.formatAnswer(question.userAnswers.photon_showers)}", la respuesta correcta es "${question.correctAnswers.photon_showers}"`);
+            }
+            if (question.userAnswers.electron_showers !== question.correctAnswers.electron_showers) {
+                incorrectDetails.push(`Cascadas Electrón: respondiste "${this.formatAnswer(question.userAnswers.electron_showers)}", la respuesta correcta es "${question.correctAnswers.electron_showers}"`);
+            }
         }
 
         if (incorrectDetails.length > 0) {

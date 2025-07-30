@@ -8,6 +8,14 @@ function setupExerciseFilters() {
         }
     });
 
+    const showParticles = urlParams.get('particles') === 'true';
+    ['hi', 'li', 'photon', 'electron'].forEach(section => {
+        const element = document.getElementById(`${section}-section`);
+        if (element) {
+            element.classList.toggle('hidden', !showParticles);
+        }
+    });
+
     if (window.currentAnswerValidator) {
         window.currentAnswerValidator.updateNextButtonState();
     }

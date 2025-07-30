@@ -30,6 +30,8 @@ class ImageNavigator {
             return;
         }
 
+        this.answerValidator.saveCurrentAnswers();
+
         const newIndex = this.currentIndex + direction;
         if (newIndex >= 0 && newIndex < this.images.length) {
             this.currentIndex = newIndex;

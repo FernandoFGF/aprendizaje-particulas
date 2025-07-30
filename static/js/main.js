@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const showInteraction = urlParams.get('interaction') === 'true';
         const showFlavor = urlParams.get('flavor') === 'true';
         const showMode = urlParams.get('mode') === 'true';
+        const showParticles = urlParams.get('particles') === 'true';
 
         if (imagesData.length > 0) {
             const navigator = new ImageNavigator(imagesData);
@@ -20,7 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         imagesData,
                         showInteraction,
                         showFlavor,
-                        showMode
+                        showMode,
+                        showParticles
                     );
                     quizResults.showResults();
                 });

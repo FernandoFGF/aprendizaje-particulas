@@ -30,12 +30,14 @@ def exercise():
     interaction = request.args.get('interaction', 'true') == 'true'
     flavor = request.args.get('flavor', 'true') == 'true'
     mode = request.args.get('mode', 'true') == 'true'
+    particles = request.args.get('particles', 'true') == 'true'
     count = request.args.get('count', '5')
 
     filtered_images = ParticleDAO.get_filtered_images(
         show_interaction=interaction,
         show_flavor=flavor,
         show_mode=mode,
+        show_particles=particles,
         count=count
     )
 
@@ -46,7 +48,8 @@ def exercise():
         current_index=0,
         show_interaction=interaction,
         show_flavor=flavor,
-        show_mode=mode
+        show_mode=mode,
+        show_particles=particles
     ))
 
     response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'

@@ -87,7 +87,7 @@ class ParticleDAO:
                 Connection.release_connection(connection)
 
     @classmethod
-    def get_filtered_images(cls, show_interaction=True, show_flavor=True, show_mode=True, count='5'):
+    def get_filtered_images(cls, show_interaction=True, show_flavor=True, show_mode=True, show_particles=True, count='5'):
         connection = None
         try:
             id_query = "SELECT id FROM particle_quizzes"
@@ -115,6 +115,13 @@ class ParticleDAO:
                 fields.append('flavor')
             if show_mode:
                 fields.append('interaction_mode')
+            if show_particles:
+                fields.extend([
+                    'heavy_ion_track_count',
+                    'light_ion_track_count',
+                    'photon_shower_count',
+                    'electron_shower_count'
+                ])
 
             query = f"""SELECT {','.join(fields)}
                         FROM particle_quizzes
@@ -137,7 +144,7 @@ class ParticleDAO:
         try:
             connection = Connection.get_connection()
             cursor = connection.cursor(dictionary=True)
-            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode FROM particle_quizzes ORDER BY id"
+            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode, heavy_ion_track_count, light_ion_track_count, photon_shower_count, electron_shower_count FROM particle_quizzes ORDER BY id"
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:
