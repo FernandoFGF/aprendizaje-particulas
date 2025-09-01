@@ -21,7 +21,11 @@ class LearnNavigator {
             characteristicsPanel: document.getElementById('characteristics-panel'),
             interactionType: document.getElementById('interaction-type'),
             flavor: document.getElementById('flavor'),
-            interactionMode: document.getElementById('interaction-mode')
+            interactionMode: document.getElementById('interaction-mode'),
+            heavyIonTracks: document.getElementById('heavy-ion-tracks'),
+            lightIonTracks: document.getElementById('light-ion-tracks'),
+            photonShowers: document.getElementById('photon-showers'),
+            electronShowers: document.getElementById('electron-showers')
         };
     }
 
@@ -99,65 +103,17 @@ class LearnNavigator {
         if (this.elements.interactionMode) {
             this.elements.interactionMode.textContent = interactionModeMap[particle.interaction_mode] || 'Desconocido';
         }
-
-        if (this.elements.characteristicsPanel) {
-            // Crear elementos dinámicamente si no existen
-            if (!this.elements.heavyIonTracks) {
-                const heavyIonDiv = document.createElement('div');
-                heavyIonDiv.className = 'characteristic-item';
-                heavyIonDiv.innerHTML = `
-                    <div class="characteristic-label">Trazas HI (Pesadas):</div>
-                    <div class="characteristic-value" id="heavy-ion-tracks"></div>
-                `;
-                this.elements.characteristicsPanel.appendChild(heavyIonDiv);
-            this.elements.heavyIonTracks = document.getElementById('heavy-ion-tracks');
-            }
-
-            if (!this.elements.lightIonTracks) {
-                const lightIonDiv = document.createElement('div');
-                lightIonDiv.className = 'characteristic-item';
-                lightIonDiv.innerHTML = `
-                    <div class="characteristic-label">Trazas LI (Ligeras):</div>
-                    <div class="characteristic-value" id="light-ion-tracks"></div>
-                `;
-                this.elements.characteristicsPanel.appendChild(lightIonDiv);
-                this.elements.lightIonTracks = document.getElementById('light-ion-tracks');
-            }
-
-            if (!this.elements.photonShowers) {
-                const photonDiv = document.createElement('div');
-                photonDiv.className = 'characteristic-item';
-                photonDiv.innerHTML = `
-                    <div class="characteristic-label">Cascadas Fotón:</div>
-                    <div class="characteristic-value" id="photon-showers"></div>
-                `;
-                this.elements.characteristicsPanel.appendChild(photonDiv);
-                this.elements.photonShowers = document.getElementById('photon-showers');
-            }
-
-            if (!this.elements.electronShowers) {
-                const electronDiv = document.createElement('div');
-                electronDiv.className = 'characteristic-item';
-                electronDiv.innerHTML = `
-                    <div class="characteristic-label">Cascadas Electrón:</div>
-                    <div class="characteristic-value" id="electron-showers"></div>
-                `;
-                this.elements.characteristicsPanel.appendChild(electronDiv);
-                this.elements.electronShowers = document.getElementById('electron-showers');
-            }
-
-            if (this.elements.heavyIonTracks) {
-                this.elements.heavyIonTracks.textContent = particle.heavy_ion_track_count || '0';
-            }
-            if (this.elements.lightIonTracks) {
-                this.elements.lightIonTracks.textContent = particle.light_ion_track_count || '0';
-            }
-            if (this.elements.photonShowers) {
-                this.elements.photonShowers.textContent = particle.photon_shower_count || '0';
-            }
-            if (this.elements.electronShowers) {
-                this.elements.electronShowers.textContent = particle.electron_shower_count || '0';
-            }
+        if (this.elements.heavyIonTracks) {
+            this.elements.heavyIonTracks.textContent = particle.heavy_ion_track_count || '0';
+        }
+        if (this.elements.lightIonTracks) {
+            this.elements.lightIonTracks.textContent = particle.light_ion_track_count || '0';
+        }
+        if (this.elements.photonShowers) {
+            this.elements.photonShowers.textContent = particle.photon_shower_count || '0';
+        }
+        if (this.elements.electronShowers) {
+            this.elements.electronShowers.textContent = particle.electron_shower_count || '0';
         }
     }
 
@@ -205,7 +161,23 @@ class LearnNavigator {
             this.elements.nextBtn.disabled = this.currentIndex === this.particles.length - 1;
         }
 
+        this.updateEnergyValues(particle);
         this.updateCharacteristicsDisplay();
+    }
+
+    updateEnergyValues(particle) {
+        const neutrinoEnergyElement = document.getElementById('learn-neutrino-energy');
+        if (neutrinoEnergyElement && particle.neutrino_energy !== undefined) {
+            const formattedEnergy = parseFloat(particle.neutrino_energy).toFixed(6);
+            neutrinoEnergyElement.textContent = `${formattedEnergy} GeV`;
+        }
+
+        const depositedEnergyElement = document.getElementById('learn-deposited-energy');
+        if (depositedEnergyElement && particle.neutrino_energy !== undefined && particle.invisible_energy !== undefined) {
+            const depositedEnergy = parseFloat(particle.neutrino_energy) - parseFloat(particle.invisible_energy || 0);
+            const formattedDepositedEnergy = depositedEnergy.toFixed(6);
+            depositedEnergyElement.textContent = `${formattedDepositedEnergy} GeV`;
+        }
     }
 
     disableNavigation() {

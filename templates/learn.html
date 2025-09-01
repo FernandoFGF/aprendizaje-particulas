@@ -131,6 +131,12 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        #learn-neutrino-energy,
+        #learn-deposited-energy {
+            color: #2c3e50;
+            font-family: monospace;
+            font-size: 1em;
+        }
     </style>
 </head>
 <body>
@@ -194,6 +200,30 @@
                             <div class="characteristic-item">
                                 <div class="characteristic-label">Modo de Interacción:</div>
                                 <div class="characteristic-value" id="interaction-mode"></div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Trazas HI (Pesadas):</div>
+                                <div class="characteristic-value" id="heavy-ion-tracks">0</div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Trazas LI (Ligeras):</div>
+                                <div class="characteristic-value" id="light-ion-tracks">0</div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Cascadas Fotón:</div>
+                                <div class="characteristic-value" id="photon-showers">0</div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Cascadas Electrón:</div>
+                                <div class="characteristic-value" id="electron-showers">0</div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Energía del neutrino:</div>
+                                <div class="characteristic-value" id="learn-neutrino-energy">0.000000 GeV</div>
+                            </div>
+                            <div class="characteristic-item">
+                                <div class="characteristic-label">Energía depositada en el LAr:</div>
+                                <div class="characteristic-value" id="learn-deposited-energy">0.000000 GeV</div>
                             </div>
                         </div>
 

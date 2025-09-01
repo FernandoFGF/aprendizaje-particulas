@@ -145,7 +145,7 @@ class ParticleDAO:
         try:
             connection = Connection.get_connection()
             cursor = connection.cursor(dictionary=True)
-            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode, heavy_ion_track_count, light_ion_track_count, photon_shower_count, electron_shower_count, neutrino_energy FROM particle_quizzes ORDER BY id"
+            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode, heavy_ion_track_count, light_ion_track_count, photon_shower_count, electron_shower_count, neutrino_energy, invisible_energy FROM particle_quizzes ORDER BY id"
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:
