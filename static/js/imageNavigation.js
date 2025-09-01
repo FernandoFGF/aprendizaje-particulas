@@ -51,6 +51,9 @@ class ImageNavigator {
         const imgElement = this.elements.zoomImage;
         this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
         this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
+
+        this.updateEnergyValues(image);
+
         this.elements.questionNumber.textContent = this.currentIndex + 1;
         this.elements.totalQuestions.textContent = this.images.length;
 
@@ -89,5 +92,20 @@ class ImageNavigator {
         });
 
         this.elements.nextBtn.disabled = !allAnswered;
+    }
+
+    updateEnergyValues(image) {
+        const neutrinoEnergyElement = document.getElementById('neutrino-energy-value');
+        if (neutrinoEnergyElement && image.neutrino_energy !== undefined) {
+            const formattedEnergy = parseFloat(image.neutrino_energy).toFixed(6);
+            neutrinoEnergyElement.textContent = `${formattedEnergy} GeV`;
+        }
+
+        const depositedEnergyElement = document.getElementById('deposited-energy-value');
+        if (depositedEnergyElement && image.neutrino_energy !== undefined && image.invisible_energy !== undefined) {
+            const depositedEnergy = parseFloat(image.neutrino_energy) - parseFloat(image.invisible_energy);
+            const formattedDepositedEnergy = depositedEnergy.toFixed(6);
+            depositedEnergyElement.textContent = `${formattedDepositedEnergy} GeV`;
+        }
     }
 }

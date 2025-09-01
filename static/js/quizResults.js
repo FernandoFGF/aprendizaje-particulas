@@ -261,6 +261,8 @@ class QuizResults {
                 </div>
             ` : '';
 
+            const depositedEnergy = parseFloat(question.image.neutrino_energy) - parseFloat(question.image.invisible_energy || 0);
+
             return `
                 <div class="question-result mb-4 p-3 border ${statusClass} rounded">
                     <div class="d-flex align-items-center mb-3">
@@ -269,7 +271,26 @@ class QuizResults {
                             <i class="${statusIcon} me-1"></i>${statusText} (${partialScore}%)
                         </span>
                     </div>
-            
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="p-2 bg-info bg-opacity-10 rounded">
+                                <small class="text-info">
+                                    <i class="fas fa-bolt me-1"></i>
+                                    Energía neutrino: ${question.image.neutrino_energy} GeV
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-2 bg-info bg-opacity-10 rounded">
+                                <small class="text-info">
+                                    <i class="fas fa-tint me-1"></i>
+                                    Energía depositada: ${depositedEnergy.toFixed(6)} GeV
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-3">
                             <img src="/imagen_externa/${encodeURIComponent(question.image.image_path)}" 

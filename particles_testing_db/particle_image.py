@@ -1,15 +1,17 @@
 class Particle:
-    def __init__(self, id=None, image_path=None, interaction_type=None, flavor=None, interaction_mode=None):
+    def __init__(self, id=None, image_path=None, interaction_type=None, flavor=None, interaction_mode=None, neutrino_energy=None):
         self.id = id
         self.image_path = image_path
         self.interaction_type = interaction_type
         self.flavor = flavor
         self.interaction_mode = interaction_mode
+        self.neutrino_energy = neutrino_energy
 
     def __str__(self):
         return (f'Id: {self.id}, Path: {self.image_path}, '
                 f'Tipo interacción: {self.interaction_type}, Sabor: {self.flavor}, '
-                f'Modo interacción: {self.interaction_mode}')
+                f'Modo interacción: {self.interaction_mode}, '
+                f'Energía neutrino: {self.neutrino_energy}')
 
     @property
     def interaction_type_str(self):

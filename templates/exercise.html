@@ -6,7 +6,9 @@
     <title>Aprendizaje por Clasificación</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
 
     <!-- CSS personalizado -->
     <style>
@@ -173,6 +175,93 @@
             font-size: 0.8rem;
             color: #6c757d;
         }
+
+        .image-original-container {
+            margin-left: 0;
+            margin-right: auto;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .image-original-container img {
+            max-height: 500px;
+            width: auto;
+            max-width: 95%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .row {
+            align-items: stretch;
+        }
+
+        .col-md-8 {
+            flex: 0 0 70%; /* La imagen ocupa 70% */
+            max-width: 70%;
+        }
+
+        .col-md-4 {
+            flex: 0 0 30%; /* La energía ocupa 30% */
+            max-width: 30%;
+        }
+
+        .particle-info-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid #1abc9c;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            padding: 15px;
+            height: auto;
+        }
+
+        .particle-info-card .card-title {
+            color: #495057;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.3rem;
+        }
+
+        .info-item {
+            margin-bottom: 12px;
+        }
+
+        .info-value {
+            font-size: 0.95rem;
+            padding: 8px;
+            background-color: white;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .info-value strong {
+            color: #1abc9c;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-left: auto;
+        }
+
+        .info-value i {
+            font-size: 1.1rem;
+        }
+
+        .info-value i.text-warning {
+            color: #ffc107 !important;
+        }
+
+        .info-value i.text-primary {
+            color: #0d6efd !important;
+        }
     </style>
 </head>
 <body>
@@ -195,26 +284,53 @@
                 </div>
                 <div class="card-body">
                     <p class="card-text">¿Qué tipo de partícula se muestra en la siguiente imagen?</p>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- Image container -->
+                            <div class="image-original-container mb-3 text-center" style="position: relative;">
+                                {% if current_image %}
+                                <img src="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
+                                     data-zoom="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
+                                     alt="Imagen de partícula"
+                                     class="img-fluid"
+                                     id="zoom-image">
+                                <!-- Container for the magnifying glass -->
+                                <div class="drift-pane-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                                    <div class="drift-pane rounded-circle" data-zoom-pane></div>
+                                </div>
+                                {% else %}
+                                <div class="no-images">
+                                    No hay imágenes disponibles con los filtros seleccionados
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
 
-                    <!-- Image container -->
-                    <div class="image-original-container mb-3 text-center" style="position: relative;">
-                        {% if current_image %}
-                        <img src="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
-                             data-zoom="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
-                             alt="Imagen de partícula"
-                             class="img-fluid"
-                             id="zoom-image">
-                        <!-- Container for the magnifying glass -->
-                        <div class="drift-pane-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-                            <div class="drift-pane rounded-circle" data-zoom-pane></div>
-                        {% else %}
+
+                        <div class="col-md-4">
+                            <div class="particle-info-card">
+                                <h6 class="card-title">Información de la partícula</h6>
+
+                                <!-- Energía del neutrino -->
+                                <div class="info-item">
+                                    <div class="info-value">
+                                        <i class="bi bi-lightning-charge text-warning"></i>
+                                        <span>Energía neutrino:</span>
+                                        <strong id="neutrino-energy-value">0.000000 GeV</strong>
+                                    </div>
+                                </div>
+
+                                <!-- Nueva: Energía depositada en el LAr -->
+                                <div class="info-item">
+                                    <div class="info-value">
+                                        <i class="bi bi-droplet text-primary"></i>
+                                        <span>Energía depositada:</span>
+                                        <strong id="deposited-energy-value">0.000000 GeV</strong>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="no-images">
-                            No hay imágenes disponibles con los filtros seleccionados
-                        </div>
-                        {% endif %}
                     </div>
-
                     <!-- Answer options -->
                     <div class="classification-form">
                         <!-- Interaction type -->

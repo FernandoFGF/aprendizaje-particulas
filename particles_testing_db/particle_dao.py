@@ -6,8 +6,8 @@ import time
 
 class ParticleDAO:
     SELECT_ALL = 'SELECT * FROM particle_quizzes ORDER BY id'
-    INSERT = 'INSERT INTO particle_quizzes(image_path, interaction_type, flavor, interaction_mode) VALUES(%s, %s, %s, %s)'
-    UPDATE = 'UPDATE particle_quizzes SET image_path=%s, interaction_type=%s, flavor=%s, interaction_mode=%s WHERE id=%s'
+    INSERT = 'INSERT INTO particle_quizzes(image_path, interaction_type, flavor, interaction_mode, neutrino_energy) VALUES(%s, %s, %s, %s, %s)'
+    UPDATE = 'UPDATE particle_quizzes SET image_path=%s, interaction_type=%s, flavor=%s, interaction_mode=%s, neutrino_energy=%s WHERE id=%s'
     DELETE = 'DELETE FROM particle_quizzes WHERE id=%s'
 
     @classmethod
@@ -18,10 +18,10 @@ class ParticleDAO:
             cursor = connection.cursor()
             cursor.execute(cls.SELECT_ALL)
             records = cursor.fetchall()
-            # Mapeo de clase-tabla particle_quizzes
+
             particles = []
             for record in records:
-                particle = Particle(record[0], record[1], record[2], record[3], record[4])
+                particle = Particle(record[0], record[1], record[2], record[3], record[4], record[9])
                 particles.append(particle)
             return particles
         except Exception as e:
@@ -38,7 +38,7 @@ class ParticleDAO:
             conection = Connection.get_connection()
             cursor = conection.cursor()
             values = (particle.image_path, particle.interaction_type,
-                       particle.flavor, particle.interaction_mode)
+                       particle.flavor, particle.interaction_mode, particle.neutrino_energy)
             cursor.execute(cls.INSERT, values)
             conection.commit()
             return cursor.rowcount
@@ -58,6 +58,7 @@ class ParticleDAO:
             cursor = connection.cursor()
             values = (particle.image_path, particle.interaction_type,
                        particle.flavor, particle.interaction_mode,
+                       particle.neutrino_energy,
                        particle.id)
             cursor.execute(cls.UPDATE, values)
             connection.commit()
@@ -107,7 +108,6 @@ class ParticleDAO:
             except ValueError:
                 pass
 
-            # Construir consulta dinámica
             fields = ['id', 'image_path']
             if show_interaction:
                 fields.append('interaction_type')
@@ -122,6 +122,7 @@ class ParticleDAO:
                     'photon_shower_count',
                     'electron_shower_count'
                 ])
+            fields.extend(['neutrino_energy', 'invisible_energy'])
 
             query = f"""SELECT {','.join(fields)}
                         FROM particle_quizzes
@@ -144,7 +145,7 @@ class ParticleDAO:
         try:
             connection = Connection.get_connection()
             cursor = connection.cursor(dictionary=True)
-            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode, heavy_ion_track_count, light_ion_track_count, photon_shower_count, electron_shower_count FROM particle_quizzes ORDER BY id"
+            query = "SELECT id, image_path, interaction_type, flavor, interaction_mode, heavy_ion_track_count, light_ion_track_count, photon_shower_count, electron_shower_count, neutrino_energy FROM particle_quizzes ORDER BY id"
             cursor.execute(query)
             return cursor.fetchall()
         except Exception as e:
@@ -157,7 +158,6 @@ class ParticleDAO:
 
 
 if __name__ == '__main__':
-    # Seleccionar los clientes
     particles = ParticleDAO.get_all()
     for particle in particles:
         print(particle)
