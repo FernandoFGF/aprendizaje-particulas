@@ -4,7 +4,28 @@ function setupIndexFilters() {
     const filterMode = document.getElementById('filter-mode');
     const imageCount = document.getElementById('image-count');
 
-    function handleStartButton() {
+    async function checkSessionBeforeRedirect() {
+        try {
+            const response = await fetch('/check_session');
+            if (!response.ok) {
+                alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
+                window.location.reload();
+                return false;
+            }
+            return true;
+        } catch (error) {
+            alert('Error de conexión. La página se recargará.');
+            window.location.reload();
+            return false;
+        }
+    }
+
+    async function handleStartButton() {
+        const isSessionActive = await checkSessionBeforeRedirect();
+        if (!isSessionActive) {
+            return;
+        }
+
         const interaction = filterInteraction.checked;
         const flavor = filterFlavor.checked;
         const mode = filterMode.checked;
@@ -15,7 +36,12 @@ function setupIndexFilters() {
         window.location.href = `/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&particles=${particles}&count=${count}&_=${timestamp}`;
     }
 
-    function handleLearnButton() {
+    async function handleLearnButton() {
+        const isSessionActive = await checkSessionBeforeRedirect();
+        if (!isSessionActive) {
+            return;
+        }
+
         const timestamp = Date.now();
         window.location.href = `/learn.html?_=${timestamp}`;
     }

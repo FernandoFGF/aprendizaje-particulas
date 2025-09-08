@@ -41,7 +41,20 @@ class LearnNavigator {
         }
     }
 
-    navigate(direction) {
+    async navigate(direction) {
+        try {
+            const response = await fetch('/check_session');
+            if (!response.ok) {
+                alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
+                window.location.reload();
+                return;
+            }
+        } catch (error) {
+            alert('Error de conexión. La página se recargará.');
+            window.location.reload();
+            return;
+        }
+
         const newIndex = this.currentIndex + direction;
         if (newIndex >= 0 && newIndex < this.particles.length) {
             this.currentIndex = newIndex;
