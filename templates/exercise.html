@@ -504,11 +504,11 @@
     <!-- Hidden element to pass data to JavaScript -->
     <script id="imagenes-data" type="application/json">{{ all_images | tojson | safe }}</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/imageZoom.js"></script>
+    <script src="{{ url_for('static', filename='js/imageZoom.js') }}"></script>
     <script src="{{ url_for('static', filename='js/answerValidation.js') }}"></script>
     <script src="{{ url_for('static', filename='js/exerciseFilters.js') }}"></script>
     <script src="{{ url_for('static', filename='js/imageNavigation.js') }}"></script>
-    <script src="/static/js/quizResults.js"></script>
+    <script src="{{ url_for('static', filename='js/quizResults.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>

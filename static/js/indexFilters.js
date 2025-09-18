@@ -6,7 +6,7 @@ function setupIndexFilters() {
 
     async function checkSessionBeforeRedirect() {
         try {
-            const response = await fetch('/check_session');
+            const response = await fetch(`/check_session`);
             if (!response.ok) {
                 alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
                 window.location.reload();
