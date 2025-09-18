@@ -25,20 +25,7 @@ class ImageNavigator {
         this.elements.nextBtn.addEventListener('click', () => this.navigate(1));
     }
 
-    async navigate(direction) {
-        try {
-            const response = await fetch('/check_session');
-            if (!response.ok) {
-                alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
-                window.location.reload();
-                return;
-            }
-        } catch (error) {
-            alert('Error de conexión. La página se recargará.');
-            window.location.reload();
-            return;
-        }
-
+    navigate(direction) {
         if (direction === 1 && this.elements.nextBtn.disabled) {
             return;
         }
