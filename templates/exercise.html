@@ -1,400 +1,399 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprendizaje por Clasificación</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+{% extends "base.html" %}
 
+{% block extra_css %}
+<style>
+    .drift-pane-container {
+        overflow: hidden;
+    }
+    .drift-zoom-pane {
+        width: 200px !important;
+        height: 200px !important;
+        border: 3px solid #fff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        border-radius: 50% !important;
+        background: white;
+        object-fit: contain !important;
+        background-size: contain !important;
+        background-repeat: no-repeat !important;
+    }
+    .drift-bounding-box {
+        background: rgba(255, 255, 255, 0.3);
+        border: 2px dashed #fff;
+        border-radius: 50%;
+    }
+    .image-zoom-container {
+        border: 1px solid #ddd;
+        margin-bottom: 20px;
+        overflow: hidden;
+        cursor: zoom-in;
+    }
+    .image-zoom-container img {
+        transition: transform 0.3s;
+        width: 100%;
+    }
+    .image-original-container {
+        text-align: center;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    .image-original-container img {
+        margin: 0 auto;
+        max-width: 80%;
+        height: auto;
+        display: block;
+    }
+    .classification-form > div {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #eee;
+    }
+    .classification-form label.form-label {
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .hidden {
+        display: none !important;
+    }
+    .classification-section:not(.hidden) {
+        transition: border-left 0.3s ease;
+        border-left: 3px solid transparent;
+        padding-left: 10px;
+    }
 
-    <!-- CSS personalizado -->
-    <style>
-        .drift-pane-container {
-            overflow: hidden;
-        }
-        .drift-zoom-pane {
-            width: 200px !important;
-            height: 200px !important;
-            border: 3px solid #fff;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            border-radius: 50% !important;
-            background: white;
-            object-fit: contain !important;
-            background-size: contain !important;
-            background-repeat: no-repeat !important;
-        }
-        .drift-bounding-box {
-            background: rgba(255, 255, 255, 0.3);
-            border: 2px dashed #fff;
-            border-radius: 50%;
-        }
-        .image-zoom-container {
-            border: 1px solid #ddd;
-            margin-bottom: 20px;
-            overflow: hidden;
-            cursor: zoom-in;
-        }
-        .image-zoom-container img {
-            transition: transform 0.3s;
-            width: 100%;
-        }
-        .image-original-container {
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-            display: block;
-        }
-        .image-original-container img {
-            margin: 0 auto;
-            max-width: 80%;
-            height: auto;
-            display: block;
-        }
-        .classification-form > div {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #eee;
-        }
-        .classification-form label.form-label {
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .classification-section:not(.hidden) {
-            transition: border-left 0.3s ease;
-            border-left: 3px solid transparent;
-            padding-left: 10px;
-        }
-
-        .classification-section:not(.hidden).incomplete {
-            border-left: 3px solid #dc3545;
-            background-color: rgba(220, 53, 69, 0.05);
-        }
-        .no-images {
-            padding: 2rem;
-            text-align: center;
-            font-size: 1.2rem;
-            color: #6c757d;
-        }
-        #next-btn:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-        .classification-section:not(.hidden):not(.completed) {
-            border-left: 3px solid #ed220e;
-            padding-left: 10px;
-        }
-        .form-check-input:checked {
-            background-color: #1abc9c !important;
-            border-color: #1abc9c !important;
-        }
-        .form-check-input:focus {
-            box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.25) !important;
-        }
-        .btn-primary {
-            background-color: #1abc9c !important;
-            border-color: #1abc9c !important;
-        }
-        .btn-primary:hover {
-            background-color: #16a085 !important;
-            border-color: #16a085 !important;
-        }
-        .btn-primary:active,
-        .btn-primary:focus,
-        .btn-primary.active {
-            background-color: #16a085 !important;
-            border-color: #16a085 !important;
-            box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.5) !important;
-        }
-        .progress-bar {
-            background-color: #1abc9c !important;
-        }
-        #next-btn:disabled {
-            background-color: #cccccc !important;
-            border-color: #cccccc !important;
-            opacity: 0.65;
-            cursor: not-allowed;
-        }
-        .btn-outline-primary {
-            color: #1abc9c !important;
-            border-color: #1abc9c !important;
-        }
-        .btn-outline-primary:hover {
-            color: white !important;
-            background-color: #1abc9c !important;
-            border-color: #1abc9c !important;
-        }
-        .btn-outline-primary:active,
-        .btn-outline-primary:focus,
-        .btn-outline-primary.active {
-            color: white !important;
-            background-color: #16a085 !important;
-            border-color: #16a085 !important;
-            box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.5) !important;
-        }
-        .btn-success {
-            background-color: #1c7100 !important;
-            border-color: #1c7100 !important;
-        }
-        .btn-success:hover {
+    .classification-section:not(.hidden).incomplete {
+        border-left: 3px solid #dc3545;
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+    .no-images {
+        padding: 2rem;
+        text-align: center;
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+    #next-btn:disabled {
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+    .classification-section:not(.hidden):not(.completed) {
+        border-left: 3px solid #ed220e;
+        padding-left: 10px;
+    }
+    .form-check-input:checked {
+        background-color: #1abc9c !important;
+        border-color: #1abc9c !important;
+    }
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.25) !important;
+    }
+    .btn-primary {
+        background-color: #1abc9c !important;
+        border-color: #1abc9c !important;
+    }
+    .btn-primary:hover {
+        background-color: #16a085 !important;
+        border-color: #16a085 !important;
+    }
+    .btn-primary:active,
+    .btn-primary:focus,
+    .btn-primary.active {
+        background-color: #16a085 !important;
+        border-color: #16a085 !important;
+        box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.5) !important;
+    }
+    .progress-bar {
+        background-color: #1abc9c !important;
+    }
+    #next-btn:disabled {
+        background-color: #cccccc !important;
+        border-color: #cccccc !important;
+        opacity: 0.65;
+        cursor: not-allowed;
+    }
+    .btn-outline-primary {
+        color: #1abc9c !important;
+        border-color: #1abc9c !important;
+    }
+    .btn-outline-primary:hover {
+        color: white !important;
+        background-color: #1abc9c !important;
+        border-color: #1abc9c !important;
+    }
+    .btn-outline-primary:active,
+    .btn-outline-primary:focus,
+    .btn-outline-primary.active {
+        color: white !important;
+        background-color: #16a085 !important;
+        border-color: #16a085 !important;
+        box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.5) !important;
+    }
+    .btn-success {
+        background-color: #1c7100 !important;
+        border-color: #1c7100 !important;
+    }
+    .btn-success:hover {
+    background-color: #155a00 !important;
+    border-color: #155a00 !important;
+    }
+    .btn-success:active,
+    .btn-success:focus,
+    .btn-success.active {
         background-color: #155a00 !important;
         border-color: #155a00 !important;
-        }
-        .btn-success:active,
-        .btn-success:focus,
-        .btn-success.active {
-            background-color: #155a00 !important;
-            border-color: #155a00 !important;
-            box-shadow: 0 0 0 0.25rem rgba(28, 113, 0, 0.5) !important;
-        }
-        #particles-section {
-            border-left: 3px solid #6c757d;
-            padding-left: 15px;
-            background-color: rgba(108, 117, 125, 0.05);
-        }
-        #particles-section label.fw-bold {
-            color: #495057;
-            font-size: 1.1rem;
-        }
+        box-shadow: 0 0 0 0.25rem rgba(28, 113, 0, 0.5) !important;
+    }
+    #particles-section {
+        border-left: 3px solid #6c757d;
+        padding-left: 15px;
+        background-color: rgba(108, 117, 125, 0.05);
+    }
+    #particles-section label.fw-bold {
+        color: #495057;
+        font-size: 1.1rem;
+    }
 
-        #particles-section .form-select-sm {
-            height: calc(1.5em + 0.5rem + 2px);
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-        }
-        #particles-section .text-muted {
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        #particles-section .small {
-            font-size: 0.8rem;
-            color: #6c757d;
-        }
+    #particles-section .form-select-sm {
+        height: calc(1.5em + 0.5rem + 2px);
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+    #particles-section .text-muted {
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    #particles-section .small {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
 
-        .image-original-container {
-            margin-left: 0;
-            margin-right: auto;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
+    .image-original-container {
+        margin-left: 0;
+        margin-right: auto;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-        .image-original-container img {
-            max-height: 500px;
-            width: auto;
-            max-width: 95%;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
+    .image-original-container img {
+        max-height: 500px;
+        width: auto;
+        max-width: 95%;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
 
-        .row {
-            align-items: stretch;
-        }
+    .row {
+        align-items: stretch;
+    }
 
-        .col-md-8 {
-            flex: 0 0 70%; /* La imagen ocupa 70% */
-            max-width: 70%;
-        }
+    .col-md-8 {
+        flex: 0 0 70%; /* La imagen ocupa 70% */
+        max-width: 70%;
+    }
 
-        .col-md-4 {
-            flex: 0 0 30%; /* La energía ocupa 30% */
-            max-width: 30%;
-        }
+    .col-md-4 {
+        flex: 0 0 30%; /* La energía ocupa 30% */
+        max-width: 30%;
+    }
 
-        .particle-info-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 3px solid #1abc9c;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            padding: 15px;
-            height: auto;
-        }
+    .particle-info-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #1abc9c;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        padding: 15px;
+        height: auto;
+    }
 
-        .particle-info-card .card-title {
-            color: #495057;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.8rem;
-            border-bottom: 1px solid #dee2e6;
-            padding-bottom: 0.3rem;
-        }
+    .particle-info-card .card-title {
+        color: #495057;
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.8rem;
+        border-bottom: 1px solid #dee2e6;
+        padding-bottom: 0.3rem;
+    }
 
-        .info-item {
-            margin-bottom: 12px;
-        }
+    .info-item {
+        margin-bottom: 12px;
+    }
 
-        .info-value {
-            font-size: 0.95rem;
-            padding: 8px;
-            background-color: white;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
+    .info-value {
+        font-size: 0.95rem;
+        padding: 8px;
+        background-color: white;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
 
-        .info-value strong {
-            color: #1abc9c;
-            font-weight: 600;
-            font-size: 1rem;
-            margin-left: auto;
-        }
+    .info-value strong {
+        color: #1abc9c;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-left: auto;
+    }
 
-        .info-value i {
-            font-size: 1.1rem;
-        }
+    .info-value i {
+        font-size: 1.1rem;
+    }
 
-        .info-value i.text-warning {
-            color: #ffc107 !important;
-        }
+    .info-value i.text-warning {
+        color: #ffc107 !important;
+    }
 
-        .info-value i.text-primary {
-            color: #0d6efd !important;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-4">
-        <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3">Aprendizaje por clasificación</h1>
-        </div>
+    .info-value i.text-primary {
+        color: #0d6efd !important;
+    }
+</style>
+{% endblock %}
 
-        <!-- Progress bar -->
-        <div class="progress mb-4">
-            <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-        </div>
+{% block content %}
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Aprendizaje por clasificación</h1>
+    </div>
 
-        <!-- Question container -->
-        <div id="question-wrapper">
-            <div class="card mb-4">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0">Pregunta <span id="question-number"></span> de <span id="total-questions"></span></h5>
-                </div>
-                <div class="card-body">
-                    <p class="card-text">¿Qué tipo de partícula se muestra en la siguiente imagen?</p>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <!-- Image container -->
-                            <div class="image-original-container mb-3 text-center" style="position: relative;">
-                                {% if current_image %}
-                                <img src="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
-                                     data-zoom="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
-                                     alt="Imagen de partícula"
-                                     class="img-fluid"
-                                     id="zoom-image">
-                                <!-- Container for the magnifying glass -->
-                                <div class="drift-pane-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
-                                    <div class="drift-pane rounded-circle" data-zoom-pane></div>
-                                </div>
-                                {% else %}
-                                <div class="no-images">
-                                    No hay imágenes disponibles con los filtros seleccionados
-                                </div>
-                                {% endif %}
+    <!-- Progress bar -->
+    <div class="progress mb-4">
+        <div id="progress-bar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+    </div>
+
+    <!-- Question container -->
+    <div id="question-wrapper">
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">Pregunta <span id="question-number"></span> de <span id="total-questions"></span></h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">¿Qué tipo de partícula se muestra en la siguiente imagen?</p>
+                <div class="row">
+                    <div class="col-md-8">
+                        <!-- Image container -->
+                        <div class="image-original-container mb-3 text-center" style="position: relative;">
+                            {% if current_image %}
+                            {% if SERVE_IMAGES_VIA_FLASK %}
+                            <img src="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
+                                 data-zoom="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
+                                 alt="Imagen de partícula"
+                                 class="img-fluid"
+                                 id="zoom-image">
+                            {% else %}
+                            <img src="{{ BASE_URL }}/imagen_externa/{{ current_image.image_path }}"
+                                 data-zoom="{{ BASE_URL }}/imagen_externa/{{ current_image.image_path }}"
+                                 alt="Imagen de partícula"
+                                 class="img-fluid"
+                                 id="zoom-image">
+                            {% endif %}
+                            <!-- Container for the magnifying glass -->
+                            <div class="drift-pane-container" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;">
+                                <div class="drift-pane rounded-circle" data-zoom-pane></div>
                             </div>
+                            {% else %}
+                            <div class="no-images">
+                                No hay imágenes disponibles con los filtros seleccionados
+                            </div>
+                            {% endif %}
                         </div>
+                    </div>
 
 
-                        <div class="col-md-4">
-                            <div class="particle-info-card">
-                                <h6 class="card-title">Información de la partícula</h6>
+                    <div class="col-md-4">
+                        <div class="particle-info-card">
+                            <h6 class="card-title">Información de la partícula</h6>
 
-                                <!-- Energía del neutrino -->
-                                <div class="info-item">
-                                    <div class="info-value">
-                                        <i class="bi bi-lightning-charge text-warning"></i>
-                                        <span>Energía neutrino:</span>
-                                        <strong id="neutrino-energy-value">0.000000 GeV</strong>
-                                    </div>
+                            <!-- Energía del neutrino -->
+                            <div class="info-item">
+                                <div class="info-value">
+                                    <i class="bi bi-lightning-charge text-warning"></i>
+                                    <span>Energía neutrino:</span>
+                                    <strong id="neutrino-energy-value">0.000000 GeV</strong>
                                 </div>
+                            </div>
 
-                                <!-- Nueva: Energía depositada en el LAr -->
-                                <div class="info-item">
-                                    <div class="info-value">
-                                        <i class="bi bi-droplet text-primary"></i>
-                                        <span>Energía depositada:</span>
-                                        <strong id="deposited-energy-value">0.000000 GeV</strong>
-                                    </div>
+                            <!-- Nueva: Energía depositada en el LAr -->
+                            <div class="info-item">
+                                <div class="info-value">
+                                    <i class="bi bi-droplet text-primary"></i>
+                                    <span>Energía depositada:</span>
+                                    <strong id="deposited-energy-value">0.000000 GeV</strong>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Answer options -->
-                    <div class="classification-form">
-                        <!-- Interaction type -->
-                        <div class="mb-3 classification-section" id="interaction-section">
-                            <label class="form-label fw-bold">Tipo de interacción:</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_type" id="q-cc" value="CC" required>
-                                    <label class="form-check-label" for="q-cc">CC</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_type" id="q-nc" value="NC">
-                                    <label class="form-check-label" for="q-nc">NC</label>
-                                </div>
+                </div>
+                <!-- Answer options -->
+                <div class="classification-form">
+                    <!-- Interaction type -->
+                    <div class="mb-3 classification-section" id="interaction-section">
+                        <label class="form-label fw-bold">Tipo de interacción:</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_type" id="q-cc" value="CC" required>
+                                <label class="form-check-label" for="q-cc">CC</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_type" id="q-nc" value="NC">
+                                <label class="form-check-label" for="q-nc">NC</label>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Flavor -->
-                        <div class="mb-3 classification-section" id="flavor-section">
-                            <label class="form-label fw-bold">Sabor:</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flavor" id="q-muon" value="Muón" required>
-                                    <label class="form-check-label" for="q-muon">Muón</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flavor" id="q-electron" value="Electrón">
-                                    <label class="form-check-label" for="q-electron">Electrón</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flavor" id="q-tau" value="Tau">
-                                    <label class="form-check-label" for="q-tau">Tau</label>
-                                </div>
+                    <!-- Flavor -->
+                    <div class="mb-3 classification-section" id="flavor-section">
+                        <label class="form-label fw-bold">Sabor:</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flavor" id="q-muon" value="Muon" required>
+                                <label class="form-check-label" for="q-muon">Muon</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flavor" id="q-electron" value="Electrón">
+                                <label class="form-check-label" for="q-electron">Electrón</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="flavor" id="q-tau" value="Tau">
+                                <label class="form-check-label" for="q-tau">Tau</label>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Interaction mode -->
-                        <div class="mb-3 classification-section" id="mode-section">
-                            <label class="form-label fw-bold">Modo de interacción:</label>
-                            <div class="d-flex flex-wrap gap-3">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-qe" value="QE" required>
-                                    <label class="form-check-label" for="q-qe">QE</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-mec" value="MEC">
-                                    <label class="form-check-label" for="q-mec">MEC</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-res" value="RES">
-                                    <label class="form-check-label" for="q-res">RES</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-dis" value="DIS">
-                                    <label class="form-check-label" for="q-dis">DIS</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="interaction_mode" id="q-coh" value="COH">
-                                    <label class="form-check-label" for="q-coh">COH</label>
-                                </div>
+                    <!-- Interaction mode -->
+                    <div class="mb-3 classification-section" id="mode-section">
+                        <label class="form-label fw-bold">Modo de interacción:</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_mode" id="q-qe" value="QE" required>
+                                <label class="form-check-label" for="q-qe">QE</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_mode" id="q-mec" value="MEC">
+                                <label class="form-check-label" for="q-mec">MEC</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_mode" id="q-res" value="RES">
+                                <label class="form-check-label" for="q-res">RES</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_mode" id="q-dis" value="DIS">
+                                <label class="form-check-label" for="q-dis">DIS</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="interaction_mode" id="q-coh" value="COH">
+                                <label class="form-check-label" for="q-coh">COH</label>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mb-3 classification-section" id="particles-section">
+                    <div class="mb-3 classification-section" id="particles-section">
                             <label class="form-label fw-bold">Partículas en el suceso</label>
                             <div class="row mt-3">
                                 <div class="col-md-6 mb-3">
@@ -410,11 +409,6 @@
                                                 <option value="3">3</option>
                                                 <option value="4">4</option>
                                                 <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
                                             </select>
                                         </div>
                                         <div class="col-6">
@@ -427,11 +421,6 @@
                                                 <option value="3">3</option>
                                                 <option value="4">4</option>
                                                 <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
                                             </select>
                                         </div>
                                     </div>
@@ -449,11 +438,6 @@
                                                 <option value="3">3</option>
                                                 <option value="4">4</option>
                                                 <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
                                             </select>
                                         </div>
                                         <div class="col-6">
@@ -466,49 +450,43 @@
                                                 <option value="3">3</option>
                                                 <option value="4">4</option>
                                                 <option value="5">5</option>
-                                                <option value="6">6</option>
-                                                <option value="7">7</option>
-                                                <option value="8">8</option>
-                                                <option value="9">9</option>
-                                                <option value="10">10</option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Navegation -->
-        <div class="d-flex justify-content-between">
-            <button id="prev-btn" class="btn btn-outline-primary" disabled>
-                <i class="fas fa-arrow-left me-2"></i>Anterior
+    <!-- Navigation -->
+    <div class="d-flex justify-content-between">
+        <button id="prev-btn" class="btn btn-outline-primary" disabled>
+            <i class="bi bi-arrow-left me-2"></i>Anterior
+        </button>
+        <div id="next-btn-wrapper">
+            <button id="next-btn" class="btn btn-primary" disabled>
+                Siguiente<i class="bi bi-arrow-right ms-2"></i>
             </button>
-            <div class="position-relative d-inline-block" data-bs-toggle="tooltip"
-                 title="Selecciona una opción en cada categoría visible" id="next-btn-wrapper">
-                <button id="next-btn" class="btn btn-primary" disabled>
-                    Siguiente<i class="fas fa-arrow-right ms-2"></i>
-                </button>
-            </div>
             <button id="submit-btn" class="btn btn-success d-none">
-                Enviar
+                <i class="bi bi-check-circle me-2"></i>Finalizar Quiz
             </button>
         </div>
     </div>
+</div>
 
-    <!-- Scripts -->
-    <!-- Hidden element to pass data to JavaScript -->
-    <script id="imagenes-data" type="application/json">{{ all_images | tojson | safe }}</script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/imageZoom.js"></script>
-    <script src="{{ url_for('static', filename='js/answerValidation.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/exerciseFilters.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/imageNavigation.js') }}"></script>
-    <script src="/static/js/quizResults.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
-</html>
+<!-- Hidden element to pass data to JavaScript -->
+<script id="images-data" type="application/json">{{ all_images | tojson | safe }}</script>
+<script id="current-index" type="application/json">{{ current_index }}</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/imageZoom.js') }}"></script>
+<script src="{{ url_for('static', filename='js/answerValidation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/exerciseFilters.js') }}"></script>
+<script src="{{ url_for('static', filename='js/imageNavigation.js') }}"></script>
+<script src="{{ url_for('static', filename='js/quizResults.js') }}"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

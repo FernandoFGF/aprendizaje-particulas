@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof bootstrap !== 'undefined') {
-        const imagesData = JSON.parse(document.getElementById('imagenes-data').textContent);
+        const imagesData = JSON.parse(document.getElementById('images-data').textContent);
         const urlParams = new URLSearchParams(window.location.search);
 
         const showInteraction = urlParams.get('interaction') === 'true';

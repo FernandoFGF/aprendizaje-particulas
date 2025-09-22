@@ -41,7 +41,22 @@ class LearnNavigator {
         }
     }
 
-    navigate(direction) {
+    async navigate(direction) {
+        const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+
+        try {
+            const response = await fetch(`${baseUrl}/check_session`);
+            if (!response.ok) {
+                alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
+                window.location.reload();
+                return;
+            }
+        } catch (error) {
+            alert('Error de conexión. La página se recargará.');
+            window.location.reload();
+            return;
+        }
+
         const newIndex = this.currentIndex + direction;
         if (newIndex >= 0 && newIndex < this.particles.length) {
             this.currentIndex = newIndex;
@@ -82,7 +97,7 @@ class LearnNavigator {
 
         const flavorMap = {
             12: 'Electrón',
-            14: 'Muón',
+            14: 'Muon',
             16: 'Tau'
         };
 
@@ -126,8 +141,11 @@ class LearnNavigator {
         const particle = this.particles[this.currentIndex];
 
         if (this.elements.zoomImage) {
-            this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(particle.image_path)}`;
-            this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(particle.image_path)}`;
+            const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+            const serveImagesViaFlask = window.appConfig ? window.appConfig.serveImagesViaFlask : true;
+
+            this.elements.zoomImage.src = `${baseUrl}/imagen_externa/${encodeURIComponent(particle.image_path)}`;
+            this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/${encodeURIComponent(particle.image_path)}`;
 
             if (this.zoomInstance) {
                 this.zoomInstance.destroy();
