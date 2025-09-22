@@ -6,6 +6,8 @@ class QuizResults {
         this.showFlavor = showFlavor;
         this.showMode = showMode;
         this.showParticles = showParticles;
+
+        this.baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
         this.correctAnswers = this.getCorrectAnswers();
         this.results = this.calculateResults();
     }
@@ -35,7 +37,7 @@ class QuizResults {
     mapFlavor(value) {
         const flavorMap = {
             12: 'Electrón',
-            14: 'Muón',
+            14: 'Muon',
             16: 'Tau'
         };
         return flavorMap[value] || 'Desconocido';
@@ -293,7 +295,7 @@ class QuizResults {
 
                     <div class="row">
                         <div class="col-md-3">
-                            <img src="/imagen_externa/${encodeURIComponent(question.image.image_path)}" 
+                            <img src="${this.baseUrl}/imagen_externa/${encodeURIComponent(question.image.image_path)}"
                                 alt="Imagen de partícula" class="img-fluid rounded border">
                         </div>
                         <div class="col-md-9">
@@ -338,7 +340,7 @@ class QuizResults {
                                     ${particlesTemplate}
                                 </div>
                             </div>
-                    
+
                             ${!isFullyCorrect ? this.generateIncorrectMessage(question) : ''}
                         </div>
                     </div>
@@ -359,7 +361,7 @@ class QuizResults {
                         </div>
                         ${questionHTML}
                         <div class="text-center mt-4">
-                            <button onclick="location.href='/'" class="btn btn-primary btn-lg">
+                            <button onclick="location.href='${this.baseUrl}/'" class="btn btn-primary btn-lg">
                                 <i class="fas fa-redo me-2"></i>Realizar otro quiz
                             </button>
                         </div>

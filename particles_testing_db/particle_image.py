@@ -19,7 +19,7 @@ class Particle:
 
     @property
     def flavor_str(self):
-        return {12: 'Electrón', 14: 'Muón', 16: 'Tau'}.get(self.flavor, 'Desconocido')
+        return {12: 'Electrón', 14: 'Muon', 16: 'Tau'}.get(self.flavor, 'Desconocido')
 
     @property
     def interaction_mode_str(self):

@@ -4,9 +4,11 @@ function setupIndexFilters() {
     const filterMode = document.getElementById('filter-mode');
     const imageCount = document.getElementById('image-count');
 
+    const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+
     async function checkSessionBeforeRedirect() {
         try {
-            const response = await fetch(`/check_session`);
+            const response = await fetch(`${baseUrl}/check_session`);
             if (!response.ok) {
                 alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
                 window.location.reload();
@@ -33,7 +35,7 @@ function setupIndexFilters() {
         const count = imageCount.value;
         const timestamp = Date.now();
 
-        window.location.href = `/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&particles=${particles}&count=${count}&_=${timestamp}`;
+        window.location.href = `${baseUrl}/exercise.html?interaction=${interaction}&flavor=${flavor}&mode=${mode}&particles=${particles}&count=${count}&_=${timestamp}`;
     }
 
     async function handleLearnButton() {
@@ -43,7 +45,7 @@ function setupIndexFilters() {
         }
 
         const timestamp = Date.now();
-        window.location.href = `/learn.html?_=${timestamp}`;
+        window.location.href = `${baseUrl}/learn.html?_=${timestamp}`;
     }
 
     document.getElementById('start-btn').addEventListener('click', handleStartButton);

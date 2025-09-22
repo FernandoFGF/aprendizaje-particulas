@@ -26,8 +26,10 @@ class ImageNavigator {
     }
 
     async navigate(direction) {
+        const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+
         try {
-            const response = await fetch(`/check_session`);
+            const response = await fetch(`${baseUrl}/check_session`);
             if (!response.ok) {
                 alert('Tu sesión ha expirado. Serás redirigido a la página de inicio de sesión.');
                 window.location.reload();
@@ -62,8 +64,12 @@ class ImageNavigator {
 
         const image = this.images[this.currentIndex];
         const imgElement = this.elements.zoomImage;
-        this.elements.zoomImage.src = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
-        this.elements.zoomImage.dataset.zoom = `/imagen_externa/${encodeURIComponent(image.image_path)}`;
+
+        const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+        const serveImagesViaFlask = window.appConfig ? window.appConfig.serveImagesViaFlask : true;
+
+        this.elements.zoomImage.src = `${baseUrl}/imagen_externa/${encodeURIComponent(image.image_path)}`;
+        this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/${encodeURIComponent(image.image_path)}`;
 
         this.updateEnergyValues(image);
 
