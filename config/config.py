@@ -51,6 +51,36 @@ class Config:
     def debug(self):
         return self.get('DEBUG', False)
 
+    def get_database_config(self, db_type):
+        databases = self.get('DATABASES', {})
+        return databases.get(db_type, {})
+
+    @property
+    def testing_db_config(self):
+        return self.get_database_config('testing')
+
+    @property
+    def learning_db_config(self):
+        return self.get_database_config('learning')
+
+    @property
+    def login_credentials(self):
+        return self.get('LOGIN_CREDENTIALS', {})
+
+    @property
+    def valid_username(self):
+        username = self.login_credentials.get('username')
+        if not username:
+            raise ValueError("Username no configurado en el archivo de configuración")
+        return username
+
+    @property
+    def valid_password(self):
+        password = self.login_credentials.get('password')
+        if not password:
+            raise ValueError("Password no configurado en el archivo de configuración")
+        return password
+
     def __repr__(self):
         return f"Config(env='{self.env}')"
 
