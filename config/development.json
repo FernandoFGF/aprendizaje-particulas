@@ -4,5 +4,27 @@
   "SESSION_COOKIE_SECURE": false,
   "IMAGES_DIR": "/Users/ana/Documents/Imagenes_Aprendizaje",
   "SERVE_IMAGES_VIA_FLASK": true,
-  "DEBUG": false
+  "DEBUG": false,
+  "LOGIN_CREDENTIALS": {
+    "username": "",
+    "password": ""
+  },
+  "DATABASES": {
+    "testing": {
+      "database": "particles_testing_db",
+      "username": "root",
+      "password": "neutrino",
+      "host": "localhost",
+      "port": "3306",
+      "pool_size": 15
+    },
+    "learning": {
+      "database": "particles_learning_db",
+      "username": "root",
+      "password": "neutrino",
+      "host": "localhost",
+      "port": "3306",
+      "pool_size": 15
+    }
+  }
 }

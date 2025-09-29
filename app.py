@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Flask, render_template, send_from_directory, request, make_response, session, redirect, url_for, flash
 from functools import wraps
 from config.config import Config
-from particles_testing_db.particle_dao import ParticleDAO
+from particles_testing_db.particle_dao import TestingParticleDAO, LearningParticleDAO
 
 config = Config()
 
@@ -13,13 +13,17 @@ app.secret_key = config.secret_key
 if config.session_cookie_secure:
     app.config['SESSION_COOKIE_SECURE'] = True
 
+testing_dao = TestingParticleDAO()
+learning_dao = LearningParticleDAO()
+
 HOURS = 8
 MINUTES = 0
 SECONDS = 0
 INACTIVITY_TIMEOUT_SECONDS = (HOURS * 3600) + (MINUTES * 60) + SECONDS
 
-VALID_USERNAME = 'estudiante'
-VALID_PASSWORD = 'neutrino-2025'
+VALID_USERNAME = config.valid_username
+VALID_PASSWORD = config.valid_password
+
 app_title = 'Conceptos y definiciones'
 
 IMAGES_DIR = config.images_dir
@@ -89,7 +93,7 @@ def login():
 
 @app.route('/logout')
 def logout():
-    session.clear()  # Limpia toda la sesión.
+    session.clear()
     flash('Has cerrado la sesión.', 'info')
     return redirect(url_for('login'))
 
@@ -120,7 +124,7 @@ def exercise():
     particles = request.args.get('particles', 'true') == 'true'
     count = request.args.get('count', '5')
 
-    filtered_images = ParticleDAO.get_filtered_images(
+    filtered_images = testing_dao.get_filtered_images(
         show_interaction=interaction,
         show_flavor=flavor,
         show_mode=mode,
@@ -150,7 +154,7 @@ def exercise():
 @login_required
 def learn():
     try:
-        all_particles = ParticleDAO.get_all_particles()
+        all_particles = learning_dao.get_all_particles()
 
         response = make_response(render_template(
             'learn.html',
