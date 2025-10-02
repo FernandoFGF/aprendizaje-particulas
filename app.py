@@ -1,6 +1,7 @@
 import os
+import json
 from datetime import datetime
-from flask import Flask, render_template, send_from_directory, request, make_response, session, redirect, url_for, flash
+from flask import Flask, render_template, send_from_directory, request, make_response, session, redirect, url_for, flash, jsonify
 from functools import wraps
 from config.config import Config
 from particles_testing_db.particle_dao import TestingParticleDAO, LearningParticleDAO
@@ -23,10 +24,21 @@ INACTIVITY_TIMEOUT_SECONDS = (HOURS * 3600) + (MINUTES * 60) + SECONDS
 
 VALID_USERNAME = config.valid_username
 VALID_PASSWORD = config.valid_password
-
-app_title = 'Conceptos y definiciones'
-
 IMAGES_DIR = config.images_dir
+
+
+def load_book_content():
+    try:
+        book_content_path = os.path.join(app.root_path, 'data', 'book_content.json')
+        with open(book_content_path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"Error al cargar el contenido teórico: {e}")
+        return {
+            "title": "Tecnología de las Cámaras de Proyección Temporal con Argón Líquido (LArTPCs)",
+            "pages": []
+        }
+
 
 @app.context_processor
 def inject_config():
@@ -101,7 +113,7 @@ def logout():
 @app.route('/index.html')
 @login_required
 def home():
-    return render_template('index.html', title=app_title)
+    return render_template('index.html')
 
 
 if config.serve_images_via_flask:
@@ -169,6 +181,12 @@ def learn():
     except Exception as e:
         print(f"Error in learn route: {e}")
         return f"Error: {e}", 500
+
+@app.route('/api/book-content')
+@login_required
+def api_book_content():
+    book_content = load_book_content()
+    return jsonify(book_content)
 
 
 if __name__ == '__main__':
