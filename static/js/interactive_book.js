@@ -52,7 +52,7 @@ class InteractiveBook {
                     const imagePath = this.getImagePath(img.image);
                     return `
                         <div class="text-center">
-                            <img src="${baseUrl}${imagePath}" alt="${page.title}" class="page-image">
+                            <img src="${imagePath}" alt="${page.title}" class="page-image">
                             ${img.caption ? `<div class="image-caption">${img.caption}</div>` : ''}
                         </div>
                     `;
@@ -76,7 +76,7 @@ class InteractiveBook {
         if (window.appConfig && window.appConfig.serveImagesViaFlask) {
             return `${window.appConfig.baseUrl}/imagen_externa/${imageName}`;
         }
-        return `images/${imageName}`;
+        return `${window.appConfig.baseUrl}/images/${imageName}`;
     }
 
     showPage(pageIndex) {
