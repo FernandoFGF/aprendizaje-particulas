@@ -269,14 +269,14 @@
                         <div class="image-original-container mb-3 text-center" style="position: relative;">
                             {% if current_image %}
                             {% if SERVE_IMAGES_VIA_FLASK %}
-                            <img src="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
-                                 data-zoom="{{ url_for('serve_external_image', filename=current_image.image_path) }}"
+                            <img src="{{ url_for('serve_external_image', subfolder='/assessment', filename=current_image.image_path) }}"
+                                 data-zoom="{{ url_for('serve_external_image', subfolder='/assessment', filename=current_image.image_path) }}"
                                  alt="Imagen de partícula"
                                  class="img-fluid"
                                  id="zoom-image">
                             {% else %}
-                            <img src="{{ BASE_URL }}/imagen_externa/{{ current_image.image_path }}"
-                                 data-zoom="{{ BASE_URL }}/imagen_externa/{{ current_image.image_path }}"
+                            <img src="{{ BASE_URL }}/imagen_externa/assessment/{{ current_image.image_path }}"
+                                 data-zoom="{{ BASE_URL }}/imagen_externa/assessment/{{ current_image.image_path }}"
                                  alt="Imagen de partícula"
                                  class="img-fluid"
                                  id="zoom-image">

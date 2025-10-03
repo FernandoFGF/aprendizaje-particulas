@@ -144,8 +144,8 @@ class LearnNavigator {
             const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
             const serveImagesViaFlask = window.appConfig ? window.appConfig.serveImagesViaFlask : true;
 
-            this.elements.zoomImage.src = `${baseUrl}/imagen_externa/${encodeURIComponent(particle.image_path)}`;
-            this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/${encodeURIComponent(particle.image_path)}`;
+            this.elements.zoomImage.src = `${baseUrl}/imagen_externa/learning/${encodeURIComponent(particle.image_path)}`;
+            this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/learning/${encodeURIComponent(particle.image_path)}`;
 
             if (this.zoomInstance) {
                 this.zoomInstance.destroy();
