@@ -68,8 +68,8 @@ class ImageNavigator {
         const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
         const serveImagesViaFlask = window.appConfig ? window.appConfig.serveImagesViaFlask : true;
 
-        this.elements.zoomImage.src = `${baseUrl}/imagen_externa/${encodeURIComponent(image.image_path)}`;
-        this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/${encodeURIComponent(image.image_path)}`;
+        this.elements.zoomImage.src = `${baseUrl}/imagen_externa/assessment/${encodeURIComponent(image.image_path)}`;
+        this.elements.zoomImage.dataset.zoom = `${baseUrl}/imagen_externa/assessment/${encodeURIComponent(image.image_path)}`;
 
         this.updateEnergyValues(image);
 
