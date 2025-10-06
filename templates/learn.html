@@ -264,23 +264,20 @@
                             <!-- Image container -->
                             <div class="image-original-container mb-3 text-center" style="position: relative; flex: 1;">
                                 {% if particles and particles|length > 0 %}
-                                {% if SERVE_IMAGES_VIA_FLASK %}
-                                <img src="{{ url_for('serve_external_image', subfolder='/learning', filename=particles[0].image_path) }}"
-                                     data-zoom="{{ url_for('serve_external_image', subfolder='/learning', filename=particles[0].image_path) }}"
-                                     alt="Imagen de partícula"
-                                     class="img-fluid"
-                                     id="zoom-image">
+                                    {% if SERVE_IMAGES_VIA_FLASK %}
+                                        {% set image_src=url_for('serve_external_image', subfolder='/learning', filename=particles[0].image_path)  %}
+                                    {% else %}
+                                        {% set image_src=BASE_URL ~ '/' ~ IMAGES_URL_PREFIX ~ '/learning/' ~ particles[0].image_path  %}
+                                    {% endif %}
+                                    <img src="{{ image_src }}"
+                                         data-zoom="{{ image_src }}"
+                                         alt="Imagen de partícula"
+                                         class="img-fluid"
+                                         id="zoom-image">
                                 {% else %}
-                                <img src="{{ BASE_URL }}/imagen_externa/learning/{{ particles[0].image_path }}"
-                                     data-zoom="{{ BASE_URL }}/imagen_externa/learning/{{ particles[0].image_path }}"
-                                     alt="Imagen de partícula"
-                                     class="img-fluid"
-                                     id="zoom-image">
-                                {% endif %}
-                                {% else %}
-                                <div class="no-images">
-                                    No hay partículas disponibles
-                                </div>
+                                    <div class="no-images">
+                                        No hay partículas disponibles
+                                    </div>
                                 {% endif %}
 
                                 <!-- Container for the magnifying glass -->

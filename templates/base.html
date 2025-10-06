@@ -19,7 +19,8 @@
     <script>
         window.appConfig = {
             baseUrl: '{{ BASE_URL }}',
-            serveImagesViaFlask: {{ 'true' if SERVE_IMAGES_VIA_FLASK else 'false' }}
+            serveImagesViaFlask: {{ 'true' if SERVE_IMAGES_VIA_FLASK else 'false' }},
+            imagesUrlPrefix: '{{ IMAGES_URL_PREFIX }}'
         };
 
         const baseUrl = window.appConfig.baseUrl;
