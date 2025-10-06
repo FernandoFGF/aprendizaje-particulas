@@ -73,10 +73,9 @@ class InteractiveBook {
     }
 
     getImagePath(imageName) {
-        if (window.appConfig && window.appConfig.serveImagesViaFlask) {
-            return `${window.appConfig.baseUrl}/imagen_externa/${imageName}`;
-        }
-        return `${window.appConfig.baseUrl}/images/${imageName}`;
+        const baseUrl = window.appConfig.baseUrl;
+        const imagesPrefix = window.appConfig.imagesUrlPrefix;
+        return `${baseUrl}/${imagesPrefix}/${imageName}`;
     }
 
     showPage(pageIndex) {

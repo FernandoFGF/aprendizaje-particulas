@@ -1,5 +1,6 @@
 {
   "BASE_URL": "",
+  "IMAGES_URL_PREFIX": "imagen_externa",
   "SECRET_KEY": "super-secret-key-change-it",
   "SESSION_COOKIE_SECURE": false,
   "IMAGES_DIR": "/Users/ana/Documents/Imagenes_Aprendizaje",

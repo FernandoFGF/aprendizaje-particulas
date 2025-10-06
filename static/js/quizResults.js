@@ -295,7 +295,7 @@ class QuizResults {
 
                     <div class="row">
                         <div class="col-md-3">
-                            <img src="${this.baseUrl}/imagen_externa/assessment/${encodeURIComponent(question.image.image_path)}"
+                            <img src="${this.baseUrl}/${window.appConfig.imagesUrlPrefix}/assessment/${encodeURIComponent(question.image.image_path)}"
                                 alt="Imagen de partícula" class="img-fluid rounded border">
                         </div>
                         <div class="col-md-9">

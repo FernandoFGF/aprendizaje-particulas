@@ -81,6 +81,10 @@ class Config:
             raise ValueError("Password no configurado en el archivo de configuración")
         return password
 
+    @property
+    def images_url_prefix(self):
+        return self.get('IMAGES_URL_PREFIX', 'imagen_externa')
+
     def __repr__(self):
         return f"Config(env='{self.env}')"
 

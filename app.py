@@ -44,7 +44,8 @@ def load_book_content():
 def inject_config():
     return {
         'BASE_URL': config.base_url,
-        'SERVE_IMAGES_VIA_FLASK': config.serve_images_via_flask
+        'SERVE_IMAGES_VIA_FLASK': config.serve_images_via_flask,
+        'IMAGES_URL_PREFIX': config.images_url_prefix
     }
 
 
