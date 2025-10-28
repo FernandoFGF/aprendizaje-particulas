@@ -15,7 +15,7 @@
     {% block content %}{% endblock %}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="{{ url_for('static', filename='js/energyUtils.js') }}"></script>
     <script>
         window.appConfig = {
             baseUrl: '{{ BASE_URL }}',
@@ -25,6 +25,7 @@
 
         const baseUrl = window.appConfig.baseUrl;
     </script>
+
 
     {% block extra_js %}{% endblock %}
 </body>
