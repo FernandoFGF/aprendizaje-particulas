@@ -118,15 +118,15 @@ class ImageNavigator {
     updateEnergyValues(image) {
         const neutrinoEnergyElement = document.getElementById('neutrino-energy-value');
         if (neutrinoEnergyElement && image.neutrino_energy !== undefined) {
-            const formattedEnergy = parseFloat(image.neutrino_energy).toFixed(6);
-            neutrinoEnergyElement.textContent = `${formattedEnergy} GeV`;
+            const neutrinoEnergy = window.energyUtils.formatEnergyMeV(image.neutrino_energy, 2);
+            neutrinoEnergyElement.textContent = neutrinoEnergy;
         }
 
         const depositedEnergyElement = document.getElementById('deposited-energy-value');
         if (depositedEnergyElement && image.neutrino_energy !== undefined && image.invisible_energy !== undefined) {
-            const depositedEnergy = parseFloat(image.neutrino_energy) - parseFloat(image.invisible_energy);
-            const formattedDepositedEnergy = depositedEnergy.toFixed(6);
-            depositedEnergyElement.textContent = `${formattedDepositedEnergy} GeV`;
+            const depositedEnergyGeV = parseFloat(image.neutrino_energy) - parseFloat(image.invisible_energy);
+            const depositedEnergy = window.energyUtils.formatEnergyMeV(depositedEnergyGeV, 2);
+            depositedEnergyElement.textContent = depositedEnergy;
         }
     }
 }

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block extra_css %}
+<link href="{{ url_for('static', filename='css/classify.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="header-container">
+    <div></div> <!-- Empty element to maintain spacing -->
+    <a href="{{ url_for('main_page') }}" class="btn btn-outline-primary back-button">
+      <i class="bi bi-house-fill me-2"></i>Ir a página principal
+    </a>
+  </div>
+  <div class="top-controls-container">
+    <!-- Filter controls -->
+    <div class="controls-center">
+      <div class="filter-controls">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="filter-interaction" checked>
+          <label class="form-check-label" for="filter-interaction">Tipo de interacción</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="filter-flavor" checked>
+          <label class="form-check-label" for="filter-flavor">Sabor</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="filter-mode" checked>
+          <label class="form-check-label" for="filter-mode">Modo de interacción</label>
+        </div>
+
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="filter-particles" checked>
+          <label class="form-check-label" for="filter-particles">Partículas en el suceso</label>
+        </div>
+
+        <div class="form-check form-check-inline ms-2">
+          <div class="input-group input-group-sm" style="width: 110px;">
+            <span class="input-group-text bg-transparent pe-1">
+              <i class="bi bi-images small"></i>
+            </span>
+            <select class="form-select form-select-sm" id="image-count" style="width: 80px;" aria-label="Imágenes a seleccionar">
+              <option value="5" selected>5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main container-->
+  <div class="container-fluid justify-content-center pb-2">
+        <h1>¡Bienvenido a <i>Neutrino Hunter</i>!</h1>
+          <p>
+              Te presentamos la aplicación web con la que <strong>aprenderás aspectos fundamentales de la física de neutrinos mediante simulaciones realistas y visualizaciones interactivas</strong>. De forma sencilla podrás identificar y categorizar diferentes aspectos de las interacciones de neutrinos, experimentando el trabajo diario que realiza un físico de partículas.
+          </p>
+          <p>
+              Cada suceso se muestra sobre un fondo azul oscuro, con píxeles iluminados que representan las zonas donde una partícula cargada ha depositado energía al pasar por el detector. Cuanto más cálido es el color del píxel (rojo, naranja, amarillo…), mayor es la energía depositada; los tonos fríos (azul, turquesa…) indican valores menores.
+          </p>
+          <p>
+              De este modo, un conjunto de píxeles que forman una línea recta representa la traza que ha dejado una partícula en nuestro detector, desde que se produce hasta que se absorbe o escapa. Un color uniforme a lo largo de la traza indica una deposición de energía constante, mientras que una transición hacia tonos más cálidos revela que la partícula pierde más energía hacia el final de su recorrido.
+          </p>
+          <p>
+              Para ayudarte a trabajar mejor con la imágenes, ponemos a tu disposición dos herramientas muy útiles. Un puntero de Zoom con el que podrás ampliar la zona de la imagen que más te interese, y una escala gráfica para que puedas estimar el tamaño de las trazas que estás observando.
+          </p>
+          <p>
+              Neutrino Hunter ofrece dos modos de uso: <strong>Training</strong> y <strong>Quiz</strong>. Puedes seleccionar uno u otro haciendo clic en el botón correspondiente que aparece en la parte inferior de la pantalla.
+          </p>
+          <p>
+              <u><strong>Training:</strong></u>
+              En el modo Training podrás visualizar diferentes sucesos y conocer todas las propiedades de la interacción de neutrino que aparece en la imagen. La información que te facilitamos es:
+              <ul>
+                <li> Tipo de interacción del neutrino: Corriente Cargada (CC) o Corriente Neutra (CN).</li>
+                <li> Sabor del neutrino incidente: neutrino del electrón, del muón o del tau.</li>
+                <li> Modo de interacción del neutrino: QE, RES, DIS o MEC.</li>
+                <li> Número de trazas de partículas altamente ionizantes (HI) o pesadas, como el protón.</li>
+                <li> Número de trazas de partículas poco ionizantes (LI) o ligeras, como el muon.</li>
+                <li> Número de cascadas del fotón.</li>
+                <li> Número de cascadas del electrón.</li>
+                <li> Energía del neutrino incidente.</li>
+                <li> Energía total depositada en el detector.</li>
+              </ul>
+          </p>
+          <p>
+              Una vez que te hayas familiarizado con las imágenes y con la topología asociada a cada fenómeno físico, podrás poner a prueba tus conocimientos en el modo <strong>Quiz</strong>.
+          </p>
+          <p>
+              <u><strong>Quiz:</strong></u>
+              Como usuario, puedes ajustar el grado de dificultad del ejercicio seleccionando el tipo (o tipos) de propiedades físicas sobre las que deseas ponerte a prueba. Para ello sólo tendrás que marcar las casillas en las que estés interesado en la barra superior de la página. Puedes elegir entre:
+              <ul>
+                <li> Tipo de interacción</li>
+                <li> Sabor</li>
+                <li> Modo de interacción</li>
+                <li> Número de partículas en el suceso</li>
+              </ul>
+          </p>
+          <p>
+              Te recomendamos comenzar de forma gradual, seleccionando al principio una sola propiedad física. A medida que ganes destreza, podrás aumentar la dificultad marcando tantas casillas como desees.
+              También puedes elegir el número de sucesos con los que quieras trabajar (5, 10, o 15).
+              Una vez inicies el Quiz, podrás navegar entre sucesos con los botones Anterior y Siguiente, modificando tus respuestas todas las veces que necesites. Al llegar al último suceso, <strong>haz clic en Finalizar Quiz</strong> para comprobar tus resultados.
+
+              Buena suerte!!
+          </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Learning and testing buttons -->
+  <div class="start-container">
+    <button id="learn-btn" class="btn btn-primary btn-lg">
+      TRAINING <i class="bi bi-arrow-left"></i>
+    </button>
+    <button id="start-btn" class="btn btn-primary btn-lg">
+      QUIZ <i class="bi bi-arrow-right"></i>
+    </button>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/indexFilters.js') }}"></script>
+{% endblock %}

@@ -12,8 +12,8 @@ class ImageZoom {
         };
 
         this.isActive = false;
-        this.lens = null;
         this.zoomContainer = null;
+        this.lastMousePos = { clientX: 0, clientY: 0 };
 
         this.init();
     }
@@ -27,7 +27,7 @@ class ImageZoom {
         this.zoomContainer = document.createElement('div');
         this.zoomContainer.className = 'image-zoom-container';
         this.zoomContainer.style.cssText = `
-            position: absolute;
+            position: fixed;
             width: ${this.options.lensSize}px;
             height: ${this.options.lensSize}px;
             border: ${this.options.borderWidth}px solid ${this.options.borderColor};
@@ -55,35 +55,64 @@ class ImageZoom {
     }
 
     bindEvents() {
-        this.image.addEventListener('mouseenter', (e) => this.handleMouseEnter(e));
-        this.image.addEventListener('mousemove', (e) => this.handleMouseMove(e));
-        this.image.addEventListener('mouseleave', (e) => this.handleMouseLeave(e));
+        this.image.addEventListener('mouseenter', this.handleMouseEnter.bind(this));
+        this.image.addEventListener('mousemove', this.handleMouseMove.bind(this));
+        this.image.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
 
-        // Refresh once the image has loaded
-        this.image.addEventListener('load', () => this.updateZoomImage());
+        window.addEventListener('scroll', this.handleScroll.bind(this));
+        window.addEventListener('resize', this.handleScroll.bind(this));
+
+        this.image.addEventListener('load', this.updateZoomImage.bind(this));
     }
 
     handleMouseEnter(e) {
         this.isActive = true;
         this.zoomContainer.style.display = 'block';
         this.updateZoomImage();
+
+        this.lastMousePos = { clientX: e.clientX, clientY: e.clientY };
+        this.updateZoomPosition(e.clientX, e.clientY);
     }
 
     handleMouseMove(e) {
         if (!this.isActive) return;
 
+        this.lastMousePos = { clientX: e.clientX, clientY: e.clientY };
+        this.updateZoomPosition(e.clientX, e.clientY);
+    }
+
+    handleMouseLeave(e) {
+        this.isActive = false;
+        this.zoomContainer.style.display = 'none';
+        this.lastMousePos = { clientX: 0, clientY: 0 };
+    }
+
+    handleScroll() {
+        if (this.isActive) {
+            this.updateZoomPosition(this.lastMousePos.clientX, this.lastMousePos.clientY);
+        }
+    }
+
+    updateZoomPosition(clientX, clientY) {
         const rect = this.image.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+
+        if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
+            this.handleMouseLeave();
+            return;
+        }
+
+        const x = clientX - rect.left;
+        const y = clientY - rect.top;
 
         const relativeX = x / rect.width;
         const relativeY = y / rect.height;
 
-        const lensX = e.clientX - this.options.lensSize / 2;
-        const lensY = e.clientY - this.options.lensSize / 2;
+        const lensX = clientX - this.options.lensSize / 2;
+        const lensY = clientY - this.options.lensSize / 2;
 
-        const maxX = window.innerWidth - this.options.lensSize;
-        const maxY = window.innerHeight - this.options.lensSize;
+        const halfBorder = this.options.borderWidth;
+        const maxX = window.innerWidth - this.options.lensSize - halfBorder * 2;
+        const maxY = window.innerHeight - this.options.lensSize - halfBorder * 2;
 
         this.zoomContainer.style.left = Math.max(0, Math.min(lensX, maxX)) + 'px';
         this.zoomContainer.style.top = Math.max(0, Math.min(lensY, maxY)) + 'px';
@@ -96,11 +125,6 @@ class ImageZoom {
 
         this.zoomImage.style.left = offsetX + 'px';
         this.zoomImage.style.top = offsetY + 'px';
-    }
-
-    handleMouseLeave(e) {
-        this.isActive = false;
-        this.zoomContainer.style.display = 'none';
     }
 
     updateZoomImage() {
@@ -120,5 +144,8 @@ class ImageZoom {
         this.image.removeEventListener('mousemove', this.handleMouseMove);
         this.image.removeEventListener('mouseleave', this.handleMouseLeave);
         this.image.removeEventListener('load', this.updateZoomImage);
+
+        window.removeEventListener('scroll', this.handleScroll);
+        window.removeEventListener('resize', this.handleScroll);
     }
 }

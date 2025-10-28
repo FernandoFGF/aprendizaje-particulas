@@ -1,0 +1,12 @@
+.technology-content .image-caption {
+    font-style: italic;
+    color: #7f8c8d;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 40px;
+    font-size: var(--font-size-lg);
+}
+
+.technology-content li {
+    font-size: var(--font-size-lg);
+}

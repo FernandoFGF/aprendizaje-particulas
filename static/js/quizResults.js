@@ -279,7 +279,7 @@ class QuizResults {
                             <div class="p-2 bg-info bg-opacity-10 rounded">
                                 <small class="text-info">
                                     <i class="fas fa-bolt me-1"></i>
-                                    Energía neutrino: ${question.image.neutrino_energy} GeV
+                                    Energía neutrino: ${window.energyUtils.formatEnergyMeV(question.image.neutrino_energy, 2)}
                                 </small>
                             </div>
                         </div>
@@ -287,7 +287,7 @@ class QuizResults {
                             <div class="p-2 bg-info bg-opacity-10 rounded">
                                 <small class="text-info">
                                     <i class="fas fa-tint me-1"></i>
-                                    Energía depositada: ${depositedEnergy.toFixed(6)} GeV
+                                    Energía depositada: ${window.energyUtils.formatEnergyMeV(depositedEnergy, 2)}
                                 </small>
                             </div>
                         </div>
@@ -361,8 +361,8 @@ class QuizResults {
                         </div>
                         ${questionHTML}
                         <div class="text-center mt-4">
-                            <button onclick="location.href='${this.baseUrl}/'" class="btn btn-primary btn-lg">
-                                <i class="fas fa-redo me-2"></i>Realizar otro quiz
+                            <button onclick="location.href='${this.baseUrl}/classify.html'" class="btn btn-primary btn-lg">
+                                <i class="fas fa-redo me-2"></i>Realizar otro Quiz
                             </button>
                         </div>
                     </div>

@@ -83,7 +83,7 @@ def check_session():
 @app.route('/')
 def root():
     if 'logged_in' in session:
-        return redirect(url_for('home'))
+        return redirect(url_for('main_page'))
     return redirect(url_for('login'))
 
 
@@ -98,7 +98,7 @@ def login():
             session['username'] = username
             session['last_activity'] = datetime.now().timestamp()
             flash('Has iniciado sesión correctamente.', 'success')
-            return redirect(url_for('home'))
+            return redirect(url_for('main_page'))
         else:
             flash('Credenciales incorrectas. Por favor, inténtalo de nuevo.', 'danger')
     return render_template('login.html', title='Inicio de Sesión')
@@ -111,10 +111,16 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/index.html')
+@app.route('/index')
+@login_required
+def main_page():
+    return render_template('index.html')
+
+
+@app.route('/classify.html')
 @login_required
 def home():
-    return render_template('index.html')
+    return render_template('classify.html')
 
 
 if config.serve_images_via_flask:

@@ -188,15 +188,15 @@ class LearnNavigator {
     updateEnergyValues(particle) {
         const neutrinoEnergyElement = document.getElementById('learn-neutrino-energy');
         if (neutrinoEnergyElement && particle.neutrino_energy !== undefined) {
-            const formattedEnergy = parseFloat(particle.neutrino_energy).toFixed(6);
-            neutrinoEnergyElement.textContent = `${formattedEnergy} GeV`;
+            const neutrinoEnergy = window.energyUtils.formatEnergyMeV(particle.neutrino_energy, 2);
+            neutrinoEnergyElement.textContent = neutrinoEnergy;
         }
 
         const depositedEnergyElement = document.getElementById('learn-deposited-energy');
         if (depositedEnergyElement && particle.neutrino_energy !== undefined && particle.invisible_energy !== undefined) {
-            const depositedEnergy = parseFloat(particle.neutrino_energy) - parseFloat(particle.invisible_energy || 0);
-            const formattedDepositedEnergy = depositedEnergy.toFixed(6);
-            depositedEnergyElement.textContent = `${formattedDepositedEnergy} GeV`;
+            const depositedEnergyGeV = parseFloat(particle.neutrino_energy) - parseFloat(particle.invisible_energy || 0);
+            const depositedEnergy = window.energyUtils.formatEnergyMeV(depositedEnergyGeV, 2);
+            depositedEnergyElement.textContent = depositedEnergy;
         }
     }
 

@@ -1,331 +1,92 @@
 {% extends "base.html" %}
 
 {% block extra_css %}
-<style>
-  .filter-controls {
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    margin-top: 10px;
-    flex-wrap: wrap;
-    white-space: normal;
-  }
-  .filter-controls label {
-    margin-right: 15px;
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  .start-container {
-    margin-top: 3rem;
-    text-align: center;
-  }
-  .start-container .btn-primary {
-    background-color: #1abc9c;
-    border-color: #1abc9c;
-  }
-  .btn-primary:active,
-  .btn-primary:focus,
-  .btn-primary.active {
-    background-color: #16a085 !important;
-    border-color: #16a085 !important;
-    box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.5) !important;
-  }
-  .form-check-input:checked {
-    background-color: #1abc9c;
-    border-color: #1abc9c;
-  }
-  .form-check-input:focus {
-    box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.25);
-  }
-  .form-select:focus {
-    border-color: #1abc9c;
-    box-shadow: 0 0 0 0.25rem rgba(26, 188, 156, 0.25);
-  }
-  .form-select option:checked,
-  .form-select option:focus,
-  .form-select option:hover {
-    background: linear-gradient(#1abc9c, #1abc9c) !important;
-    color: white !important;
-  }
-  .form-select option {
-    background: white !important;
-    color: black !important;
-  }
-  .book-container {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    min-height: 600px;
-    position: relative;
-    overflow: hidden;
-    margin-top: 20 px;
-  }
-  .book-page {
-    display: none;
-    padding: 40px;
-    height: 600px;
-    overflow-y: auto;
-    animation: fadeIn 0.5s ease-in-out;
-    padding-bottom: 60px;
-  }
-  .book-page.active {
-    display: block;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateX(20px); }
-    to { opacity: 1; transform: translateX(0); }
-  }
-  .page-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    margin: 20px 0;
-  }
-  .page-navigation {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 15px;
-    align-items: center;
-  }
-  .nav-btn {
-    background: #1abc9c;
-    border: none;
-    color: white;
-    padding: 12px 20px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .nav-btn:hover {
-    background: #16a085;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(26, 188, 156, 0.3);
-  }
-  .nav-btn:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-  .page-indicator {
-    background: white;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-weight: 500;
-    color: #2c3e50;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-  }
-  .page-title {
-    color: #2c3e50;
-    font-weight: 700;
-    margin-bottom: 25px;
-    border-bottom: 3px solid #1abc9c;
-    padding-bottom: 10px;
-  }
-  .page-content {
-    font-size: 16px;
-    line-height: 1.8;
-    color: #34495e;
-    text-align: justify;
-    margin-bottom: 20px;
-  }
-  .image-caption {
-    font-style: italic;
-    color: #7f8c8d;
-    text-align: center;
-    margin-top: 10px;
-    margin-bottom: 40px;
-    font-size: 14px;
-  }
-  .progress-bar-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: rgba(255,255,255,0.3);
-  }
-  .progress-bar {
-    height: 100%;
-    background: #1abc9c;
-    transition: width 0.3s ease;
-  }
-  .book-header {
-    text-align: center;
-    padding: 20px 40px;
-    background: linear-gradient(135deg, #1abc9c, #16a085);
-    color: white;
-    margin: -40px -40px 30px -40px;
-    border-radius: 15px 15px 0 0;
-  }
-  .book-header h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0;
-  }
-  .top-controls-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    position: relative;
-    margin-top: 20px;
-  }
-  .session-info {
-    position: absolute;
-    top: -10px;
-    left: 15px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 8px;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-    background-color: rgba(248, 249, 250, 0.98);
-    font-size: 0.8rem;
-    color: #6c757d;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    z-index: 10;
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-    max-width: 220px;
-  }
-  .session-info:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  }
-  .session-info .btn-outline-danger {
-    font-size: 0.7rem;
-    padding: 1px 4px;
-    border-width: 1px;
-    white-space: nowrap;
-    margin-left: 2px
-  }
-  .session-info .text-muted {
-    font-size: 0.75rem;
-    white-space: nowrap;
-    margin-right: 2px;
-  }
-  .controls-center {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    max-width: 950px;
-    margin-top: 40px;
-    width: 100%;
-  }
-  .container-fluid.pb-3 {
-    margin-top: 20px;
-  }
-  .main-content-area {
-    position: relative;
-  }
-</style>
+<link href="{{ url_for('static', filename='css/header.css') }}" rel="stylesheet">
+<link href="{{ url_for('static', filename='css/index.css') }}" rel="stylesheet">
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="top-controls-container">
-    <div class="session-info">
-      <span class="text-muted">
-        <i class="bi bi-check-circle-fill text-success"></i> Sesión activa
-      </span>
-      <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+<!-- Fixed Header Container -->
+<div class="header-container" id="header">
+    <!-- Top Logout  -->
+    <div class="logout-container bg-neutrino">
+        <div class="logout-wrapper">
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="bi bi-box-arrow-right me-1"></i>Cerrar Sesión
+            </a>
+        </div>
     </div>
 
-    <!-- Filter controls -->
-    <div class="controls-center">
-      <div class="filter-controls">
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="filter-interaction" checked>
-          <label class="form-check-label" for="filter-interaction">Tipo de interacción</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="filter-flavor" checked>
-          <label class="form-check-label" for="filter-flavor">Sabor</label>
-        </div>
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="filter-mode" checked>
-          <label class="form-check-label" for="filter-mode">Modo de interacción</label>
-        </div>
+    <!-- Top Navegation Banner -->
+    <div class="top-banner bg-neutrino text-uppercase">
+        <div class="banner-content">
+            <!-- Left Logo -->
+            <img src="{{ BASE_URL }}/{{ IMAGES_URL_PREFIX }}/logo_white.png"
+                 alt="Logo Neutrino"
+                 class="logo-left"
+                 id="logo-home"
+                 onclick="navigateToHome()">
 
-        <div class="form-check form-check-inline">
-          <input class="form-check-input" type="checkbox" id="filter-particles" checked>
-          <label class="form-check-label" for="filter-particles">Partículas en el suceso</label>
-        </div>
-
-        <div class="form-check form-check-inline ms-3">
-          <div class="input-group input-group-sm" style="width: 110px;">
-            <span class="input-group-text bg-transparent pe-1">
-              <i class="bi bi-images small"></i>
-            </span>
-            <select class="form-select form-select-sm" id="image-count" style="width: 80px;" aria-label="Imágenes a seleccionar">
-              <option value="5" selected>5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main container-->
-  <div class="container-fluid pb-3">
-    <div class="d-flex justify-content-center">
-      <div style="width: 75%;">
-        <div class="book-container">
-          <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar"></div>
-          </div>
-
-          <div id="bookPages">
-          </div>
-
-          <div class="page-navigation">
-            <button class="nav-btn" id="prevBtn">
-              <i class="bi bi-chevron-left"></i>
-              Anterior
-            </button>
-
-            <div class="page-indicator">
-              <span id="currentPage">1</span> / <span id="totalPages">7</span>
+            <div class="nav-container">
+                <a href="#" class="nav-link" data-section="introduction">Tecnología</a>
+                <a href="#" class="nav-link" data-section="modes">Modos de interacción</a>
+                <a href="#" class="nav-link" data-section="exercise">Ejercicio</a>
             </div>
 
-            <button class="nav-btn" id="nextBtn">
-              Siguiente
-              <i class="bi bi-chevron-right"></i>
-            </button>
-          </div>
+            <!-- Right Logo -->
+            <a href="https://www.ugr.es/" target="_blank">
+                    <img src="{{ BASE_URL }}/{{ IMAGES_URL_PREFIX }}/ugr_logo_2.jpg"
+                         alt="Logo UGR"
+                         class="logo-right">
+            </a>
         </div>
-      </div>
     </div>
-  </div>
-
-  <!-- Learning and testing buttons -->
-  <div class="start-container">
-    <button id="learn-btn" class="btn btn-primary btn-lg">
-      APRENDER <i class="bi bi-arrow-left"></i>
-    </button>
-    <button id="start-btn" class="btn btn-primary btn-lg">
-      PROBAR <i class="bi bi-arrow-right"></i>
-    </button>
-  </div>
 </div>
+
+<!-- Main Content Area -->
+<div class="main-content">
+    <div id="home-content" class="content-section active">
+        <div class="content-wrapper">
+            <img src="{{ BASE_URL }}/{{ IMAGES_URL_PREFIX }}/image3.png" alt="Detector DUNE">
+            <h1 class="text-uppercase text-center">Neutrino Hunter</h1>
+        </div>
+    </div>
+
+    <div id="introduction-content" class="content-section">
+        <div class="content-wrapper">
+            {% include 'technology_content.html' %}
+        </div>
+    </div>
+
+    <div id="modes-content" class="content-section">
+        <div class="content-wrapper">
+            {% include 'interaction_modes_content.html' %}
+        </div>
+    </div>
+
+    <div id="exercise-content" class="content-section">
+        <div id="exercise-container"></div>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer bg-neutrino">
+    <div class="footer-content">
+        <p><strong>Plataforma de Aprendizaje sobre Neutrinos</strong></p>
+        <p>&copy; 2025 - Todos los derechos reservados</p>
+        <p>Para más información: <a href="https://neutrino.ugr.es/" target="_blank">neutrino.ugr.es</a></p>
+    </div>
+</footer>
 {% endblock %}
 
 {% block extra_js %}
-<script src="{{ url_for('static', filename='js/indexFilters.js') }}"></script>
-<script src="{{ url_for('static', filename='js/interactive_book.js') }}"></script>
-<script src="{{ url_for('static', filename='js/book_loader.js') }}"></script>
+<script>
+    window.appConfig = {
+        baseUrl: '{{ BASE_URL }}',
+        serveImagesViaFlask: {{ 'true' if SERVE_IMAGES_VIA_FLASK else 'false' }},
+        imagesUrlPrefix: '{{ IMAGES_URL_PREFIX }}'
+    };
+    const baseUrl = window.appConfig.baseUrl;
+</script>
+<script src="{{ url_for('static', filename='js/siteNavigation.js') }}"></script>
 {% endblock %}
