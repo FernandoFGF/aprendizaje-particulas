@@ -361,8 +361,8 @@ class QuizResults {
                         </div>
                         ${questionHTML}
                         <div class="text-center mt-4">
-                            <button onclick="location.href='${this.baseUrl}/'" class="btn btn-primary btn-lg">
-                                <i class="fas fa-redo me-2"></i>Realizar otro quiz
+                            <button onclick="location.href='${this.baseUrl}/classify.html'" class="btn btn-primary btn-lg">
+                                <i class="fas fa-redo me-2"></i>Realizar otro Quiz
                             </button>
                         </div>
                     </div>
