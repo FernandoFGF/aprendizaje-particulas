@@ -49,6 +49,7 @@
     transition: border-left 0.3s ease;
     border-left: 3px solid transparent;
     padding-left: 10px;
+    margin-top: 1.5rem;
 }
 
 .classification-section:not(.hidden):first-of-type {
@@ -58,6 +59,10 @@
 .classification-section:not(.hidden).incomplete {
     border-left: 3px solid #dc3545;
     background-color: rgba(220, 53, 69, 0.05);
+}
+
+.classification-section:not(.hidden) ~ .classification-section:not(.hidden) {
+    margin-top: 1.5rem;
 }
 
 .no-images {
