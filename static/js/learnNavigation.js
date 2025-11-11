@@ -103,10 +103,10 @@ class LearnNavigator {
 
         const interactionModeMap = {
             0: 'QE (Quasi-Elástico)',
-            1: 'MEC (Meson Exchange Current)',
-            2: 'RES (Resonancia)',
-            3: 'DIS (Deep Inelastic Scattering)',
-            10: 'COH (Coherente)'
+            1: 'RES (Resonancia)',
+            2: 'DIS (Deep Inelastic Scattering)',
+            3: 'COH (Coherente)',
+            10: 'MEC (Meson Exchange Current)'
         };
 
         if (this.elements.interactionType) {
