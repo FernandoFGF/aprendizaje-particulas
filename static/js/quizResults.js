@@ -438,5 +438,43 @@ class QuizResults {
     showResults() {
         const resultsHTML = this.generateResultsHTML();
         document.body.innerHTML = resultsHTML;
+
+        this.logQuizCompletion();
+    }
+
+    async logQuizCompletion() {
+        try {
+            const { percentage, questions } = this.calculateResults();
+            const fullyCorrectCount = questions.filter(q => (q.score / q.maxScore) > 0.99).length;
+
+            const quizData = {
+                filters: {
+                    showInteraction: this.showInteraction,
+                    showFlavor: this.showFlavor,
+                    showMode: this.showMode,
+                    showParticles: this.showParticles
+                },
+                score_percentage: percentage,
+                total_questions: this.images.length,
+                correct_answers: fullyCorrectCount
+            };
+
+            const baseUrl = window.appConfig ? window.appConfig.baseUrl : '';
+            const response = await fetch(`${baseUrl}/api/quiz-completed`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(quizData)
+            });
+
+            if (!response.ok) {
+                console.error('Error logging quiz completion:', await response.text());
+            } else {
+                console.log('Quiz completion logged successfully');
+            }
+        } catch (error) {
+            console.error('Error logging quiz completion:', error);
+        }
     }
 }

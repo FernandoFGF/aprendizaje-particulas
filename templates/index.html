@@ -80,13 +80,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-    window.appConfig = {
-        baseUrl: '{{ BASE_URL }}',
-        serveImagesViaFlask: {{ 'true' if SERVE_IMAGES_VIA_FLASK else 'false' }},
-        imagesUrlPrefix: '{{ IMAGES_URL_PREFIX }}'
-    };
-    const baseUrl = window.appConfig.baseUrl;
-</script>
 <script src="{{ url_for('static', filename='js/siteNavigation.js') }}"></script>
 {% endblock %}

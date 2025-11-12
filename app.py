@@ -1,10 +1,12 @@
 import os
 import json
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from flask import Flask, render_template, send_from_directory, request, make_response, session, redirect, url_for, flash, jsonify
 from functools import wraps
 from config.config import Config
 from particles_testing_db.particle_dao import TestingParticleDAO, LearningParticleDAO
+import uuid
+from particles_analytics_db.analytics_dao import AnalyticsDAO
 
 config = Config()
 
@@ -16,6 +18,7 @@ if config.session_cookie_secure:
 
 testing_dao = TestingParticleDAO()
 learning_dao = LearningParticleDAO()
+analytics_dao = AnalyticsDAO(config.get_database_config('analytics'))
 
 HOURS = 8
 MINUTES = 0
@@ -25,6 +28,20 @@ INACTIVITY_TIMEOUT_SECONDS = (HOURS * 3600) + (MINUTES * 60) + SECONDS
 VALID_USERNAME = config.valid_username
 VALID_PASSWORD = config.valid_password
 IMAGES_DIR = config.images_dir
+
+def get_analytics_session_id():
+    if 'analytics_session_id' not in session:
+        session['analytics_session_id'] = str(uuid.uuid4())
+    return session['analytics_session_id']
+
+
+def get_client_ip():
+    if request.headers.get('X-Forwarded-For'):
+        return request.headers.get('X-Forwarded-For').split(',')[0]
+    elif request.headers.get('X-Real-IP'):
+        return request.headers.get('X-Real-IP')
+    else:
+        return request.remote_addr
 
 
 def load_book_content():
@@ -51,6 +68,30 @@ def inject_config():
 
 @app.before_request
 def check_session_activity():
+    if 'logged_in' in session:
+        analytics_session_id = get_analytics_session_id()
+
+        if 'connection_logged' not in session:
+            analytics_dao.log_connection(
+                session_id=analytics_session_id,
+                user_ip=get_client_ip(),
+                user_agent=request.headers.get('User-Agent')
+            )
+            session['connection_logged'] = True
+
+        current_path = request.path
+
+        if current_path == '/exercise.html' or current_path.startswith('/exercise.html?'):
+            analytics_dao.log_page_visit(
+                session_id=analytics_session_id,
+                page_url=current_path
+            )
+        elif current_path == '/index' or current_path == '/':
+            analytics_dao.log_page_visit(
+                session_id=analytics_session_id,
+                page_url=current_path
+            )
+
     if 'logged_in' in session:
         last_activity_timestamp = session.get('last_activity_ts')
         if last_activity_timestamp:
@@ -189,11 +230,98 @@ def learn():
         print(f"Error in learn route: {e}")
         return f"Error: {e}", 500
 
-@app.route('/api/book-content')
+
+@app.route('/api/quiz-completed', methods=['POST'])
 @login_required
-def api_book_content():
-    book_content = load_book_content()
-    return jsonify(book_content)
+def quiz_completed():
+    try:
+        data = request.get_json()
+        analytics_session_id = get_analytics_session_id()
+
+        analytics_dao.log_quiz_completion(
+            session_id=analytics_session_id,
+            quiz_filters=data.get('filters', {}),
+            score_percentage=data.get('score_percentage', 0),
+            total_questions=data.get('total_questions', 0),
+            correct_answers=data.get('correct_answers', 0)
+        )
+
+        return jsonify({'status': 'success'})
+    except Exception as e:
+        print(f"Error logging quiz completion: {e}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
+@app.route('/api/analytics/daily-stats')
+@login_required
+def daily_stats():
+    try:
+        target_date = request.args.get('date')
+        if target_date:
+            target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+
+        connections = analytics_dao.get_daily_connections(target_date)
+        quiz_stats = analytics_dao.get_quiz_completion_stats(target_date)
+        exercise_visits = analytics_dao.get_exercise_visits(target_date)
+
+        return jsonify({
+            'date': target_date or date.today().isoformat(),
+            'daily_unique_sessions': connections,
+            'exercise_page_visits': exercise_visits,
+            'quiz_completions': quiz_stats['total_completions'] if quiz_stats else 0,
+            'average_score': float(quiz_stats['avg_score']) if quiz_stats and quiz_stats['avg_score'] else 0,
+            'unique_quiz_users': quiz_stats['unique_sessions'] if quiz_stats else 0
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/analytics/detailed-stats')
+@login_required
+def detailed_stats():
+    try:
+        start_date = request.args.get('start_date')
+        end_date = request.args.get('end_date')
+
+        if not start_date or not end_date:
+            end_date = date.today()
+            start_date = end_date - timedelta(days=7)
+        else:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        stats = analytics_dao.get_detailed_stats(start_date, end_date)
+        return jsonify(stats)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/analytics')
+@login_required
+def analytics_dashboard():
+    return render_template('analytics.html')
+
+
+@app.route('/api/analytics/session-details')
+@login_required
+def session_details():
+    try:
+        target_date = request.args.get('date')
+        if target_date:
+            target_date = datetime.strptime(target_date, '%Y-%m-%d').date()
+        else:
+            target_date = date.today()
+
+        details = analytics_dao.get_session_details(target_date)
+        return jsonify(details)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/session-details')
+@login_required
+def session_details_page():
+    return render_template('session_details.html')
 
 
 if __name__ == '__main__':

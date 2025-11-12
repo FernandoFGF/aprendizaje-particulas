@@ -1,0 +1,88 @@
+/* Analytics Dashboard Styles */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    margin-bottom: 1.5rem;
+}
+
+.card-header {
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+}
+
+.stats-card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.stats-card:hover {
+    transform: translateY(-2px);
+}
+
+.stats-card .card-body {
+    padding: 1.5rem;
+}
+
+.stats-card i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.stats-card h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.stats-card p {
+    color: #ffffff;
+    margin-bottom: 0;
+}
+
+/* Table styles */
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Loading states */
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .stats-card .card-body {
+        padding: 1rem;
+    }
+
+    .stats-card i {
+        font-size: 1.5rem;
+    }
+
+    .stats-card h3 {
+        font-size: 1.5rem;
+    }
+}
+
+/* Color variants for different metric cards */
+.bg-sessions {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+}
+
+.bg-visits {
+    background: linear-gradient(135deg, #17a2b8, #138496) !important;
+}
+
+.bg-completions {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+}
+
+.bg-score {
+    background: linear-gradient(135deg, #ffc107, #e0a800) !important;
+}
