@@ -467,12 +467,6 @@ class QuizResults {
                 },
                 body: JSON.stringify(quizData)
             });
-
-            if (!response.ok) {
-                console.error('Error logging quiz completion:', await response.text());
-            } else {
-                console.log('Quiz completion logged successfully');
-            }
         } catch (error) {
             console.error('Error logging quiz completion:', error);
         }
