@@ -123,8 +123,8 @@ class ImageNavigator {
         }
 
         const depositedEnergyElement = document.getElementById('deposited-energy-value');
-        if (depositedEnergyElement && image.neutrino_energy !== undefined && image.invisible_energy !== undefined) {
-            const depositedEnergyGeV = parseFloat(image.neutrino_energy) - parseFloat(image.invisible_energy);
+        if (depositedEnergyElement && image.neutrino_energy !== undefined && image.visible_energy !== undefined) {
+            const depositedEnergyGeV = parseFloat(image.visible_energy);
             const depositedEnergy = window.energyUtils.formatEnergyMeV(depositedEnergyGeV, 2);
             depositedEnergyElement.textContent = depositedEnergy;
         }

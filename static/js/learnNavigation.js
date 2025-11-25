@@ -193,8 +193,8 @@ class LearnNavigator {
         }
 
         const depositedEnergyElement = document.getElementById('learn-deposited-energy');
-        if (depositedEnergyElement && particle.neutrino_energy !== undefined && particle.invisible_energy !== undefined) {
-            const depositedEnergyGeV = parseFloat(particle.neutrino_energy) - parseFloat(particle.invisible_energy || 0);
+        if (depositedEnergyElement && particle.neutrino_energy !== undefined && particle.visible_energy !== undefined) {
+            const depositedEnergyGeV = parseFloat(particle.visible_energy || 0);
             const depositedEnergy = window.energyUtils.formatEnergyMeV(depositedEnergyGeV, 2);
             depositedEnergyElement.textContent = depositedEnergy;
         }
