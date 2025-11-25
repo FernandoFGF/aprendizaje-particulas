@@ -263,7 +263,7 @@ class QuizResults {
                 </div>
             ` : '';
 
-            const depositedEnergy = parseFloat(question.image.neutrino_energy) - parseFloat(question.image.invisible_energy || 0);
+            const depositedEnergy = parseFloat(question.image.visible_energy || 0);
 
             return `
                 <div class="question-result mb-4 p-3 border ${statusClass} rounded">

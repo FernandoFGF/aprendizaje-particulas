@@ -129,7 +129,7 @@ class BaseParticleDAO:
                     'photon_shower_count',
                     'electron_shower_count'
                 ])
-            fields.extend(['neutrino_energy', 'invisible_energy'])
+            fields.extend(['neutrino_energy', 'visible_energy'])
 
             query = f"""SELECT {','.join(fields)}
                         FROM particle_quizzes
@@ -154,7 +154,7 @@ class BaseParticleDAO:
             query = """SELECT id, image_path, interaction_type, flavor, interaction_mode, 
                               heavy_ion_track_count, light_ion_track_count, 
                               photon_shower_count, electron_shower_count, 
-                              neutrino_energy, invisible_energy 
+                              neutrino_energy, visible_energy 
                        FROM particle_quizzes ORDER BY id"""
             cursor.execute(query)
             return cursor.fetchall()
