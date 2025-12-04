@@ -81,12 +81,17 @@ def check_session_activity():
 
         current_path = request.path
 
-        if current_path == '/exercise.html' or current_path.startswith('/exercise.html?'):
+        if current_path == '/' or current_path == '/index':
             analytics_dao.log_page_visit(
                 session_id=analytics_session_id,
                 page_url=current_path
             )
-        elif current_path == '/index' or current_path == '/':
+        elif current_path == '/exercise.html' or current_path.startswith('/exercise.html?'):
+            analytics_dao.log_page_visit(
+                session_id=analytics_session_id,
+                page_url=current_path
+            )
+        elif current_path == '/learn.html' or current_path.startswith('/learn.html?'):
             analytics_dao.log_page_visit(
                 session_id=analytics_session_id,
                 page_url=current_path
