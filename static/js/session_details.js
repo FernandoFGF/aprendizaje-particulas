@@ -57,9 +57,12 @@ class SessionDetails {
 
         const totalSessions = data.length;
         const totalQuizzes = data.reduce((sum, session) => sum + session.quizzes_completed, 0);
-        const overallAvgScore = data.reduce((sum, session) => sum + parseFloat(session.avg_score || 0), 0) / data.length;
-        const totalQuestions = data.reduce((sum, session) => sum + parseInt(session.total_questions), 0);
-        const totalCorrect = data.reduce((sum, session) => sum + parseInt(session.total_correct_answers), 0);
+        const sessionsWithQuizzes = data.filter(session => session.quizzes_completed > 0);
+        const overallAvgScore = sessionsWithQuizzes.length > 0
+            ? sessionsWithQuizzes.reduce((sum, session) => sum + parseFloat(session.avg_score || 0), 0) / sessionsWithQuizzes.length
+            : 0;
+        const totalQuestions = data.reduce((sum, session) => sum + parseInt(session.total_questions || 0), 0);
+        const totalCorrect = data.reduce((sum, session) => sum + parseInt(session.total_correct_answers || 0), 0);
         const overallAccuracy = totalQuestions > 0 ? (totalCorrect / totalQuestions * 100) : 0;
 
         summary.innerHTML = `
@@ -121,27 +124,42 @@ class SessionDetails {
             const accuracy = session.total_questions > 0 ?
                            (session.total_correct_answers / session.total_questions * 100) : 0;
 
-            const sessionIdShort = session.session_id.substring(0, 8) + '...';
+            const sessionIdShort = session.session_id ?
+                          session.session_id.substring(0, 8) + '...' :
+                          'No ID';
+
+            const hasQuizzes = session.quizzes_completed > 0;
 
             return `
                 <tr>
                     <td>
-                        <span class="text-muted small" title="${session.session_id}">
+                        <span class="text-muted small" title="${session.session_id || ''}">
                             ${sessionIdShort}
                         </span>
+                        ${!hasQuizzes ? '<br><small class="text-warning">Sin quizzes</small>' : ''}
                     </td>
-                    <td><span class="badge bg-primary">${session.quizzes_completed}</span></td>
                     <td>
-                        <span class="badge ${avgScore >= 70 ? 'bg-success' : avgScore >= 50 ? 'bg-warning' : 'bg-danger'}">
-                            ${avgScore ? avgScore.toFixed(1) + '%' : 'N/A'}
+                        <span class="badge ${hasQuizzes ? 'bg-primary' : 'bg-secondary'}">
+                            ${session.quizzes_completed || 0}
                         </span>
                     </td>
-                    <td>${session.total_questions}</td>
-                    <td>${session.total_correct_answers}</td>
                     <td>
-                        <span class="badge ${accuracy >= 70 ? 'bg-success' : accuracy >= 50 ? 'bg-warning' : 'bg-danger'}">
-                            ${accuracy.toFixed(1)}%
-                        </span>
+                        ${hasQuizzes ?
+                            `<span class="badge ${avgScore >= 70 ? 'bg-success' : avgScore >= 50 ? 'bg-warning' : 'bg-danger'}">
+                                ${avgScore.toFixed(1)}%
+                            </span>` :
+                            '<span class="badge bg-secondary">N/A</span>'
+                        }
+                    </td>
+                    <td>${session.total_questions || 0}</td>
+                    <td>${session.total_correct_answers || 0}</td>
+                    <td>
+                        ${hasQuizzes ?
+                            `<span class="badge ${accuracy >= 70 ? 'bg-success' : accuracy >= 50 ? 'bg-warning' : 'bg-danger'}">
+                                ${accuracy.toFixed(1)}%
+                            </span>` :
+                            '<span class="badge bg-secondary">N/A</span>'
+                        }
                     </td>
                     <td><small class="text-muted">${session.first_connection ? new Date(session.first_connection).toLocaleTimeString() : 'N/A'}</small></td>
                     <td><small class="text-muted">${session.last_activity ? new Date(session.last_activity).toLocaleTimeString() : 'N/A'}</small></td>

@@ -193,21 +193,24 @@ class AnalyticsDAO:
             with connection.cursor(dictionary=True) as cursor:
                 sql = """
                 SELECT 
-                    qc.session_id,
-                    DATE(qc.completion_time) as quiz_date,
-                    COUNT(*) as quizzes_completed,
-                    AVG(qc.score_percentage) as avg_score,
-                    SUM(qc.total_questions) as total_questions,
-                    SUM(qc.correct_answers) as total_correct_answers,
-                    MAX(qc.completion_time) as last_activity,
+                    dc.session_id,
+                    DATE(dc.connection_time) as connection_date,
                     -- Información de conexión
                     MIN(dc.connection_time) as first_connection,
-                    MIN(dc.user_ip) as user_ip
-                FROM quiz_completions qc
-                LEFT JOIN daily_connections dc ON qc.session_id = dc.session_id 
-                    AND DATE(dc.connection_time) = DATE(qc.completion_time)
-                WHERE DATE(qc.completion_time) = %s
-                GROUP BY qc.session_id, DATE(qc.completion_time)
+                    MAX(dc.connection_time) as last_activity,
+                    MIN(dc.user_ip) as user_ip,
+
+                    -- Información de quizzes (puede ser NULL)
+                    COUNT(qc.id) as quizzes_completed,
+                    COALESCE(AVG(qc.score_percentage), 0) as avg_score,
+                    COALESCE(SUM(qc.total_questions), 0) as total_questions,
+                    COALESCE(SUM(qc.correct_answers), 0) as total_correct_answers
+
+                FROM daily_connections dc
+                LEFT JOIN quiz_completions qc ON dc.session_id = qc.session_id 
+                    AND DATE(qc.completion_time) = DATE(dc.connection_time)
+                WHERE DATE(dc.connection_time) = %s
+                GROUP BY dc.session_id, DATE(dc.connection_time)
                 ORDER BY quizzes_completed DESC, avg_score DESC
                 """
                 cursor.execute(sql, (target_date,))

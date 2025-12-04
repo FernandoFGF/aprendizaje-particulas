@@ -121,6 +121,9 @@ class AnalyticsDashboard {
         }
 
         tbody.innerHTML = data.map(item => {
+            const rawDate = item.date;
+            const formattedDate = this.formatDateForDisplay(rawDate);
+
             const avgScore = typeof item.avg_score === 'string' ?
                         parseFloat(item.avg_score) :
                         item.avg_score;
@@ -136,7 +139,7 @@ class AnalyticsDashboard {
 
             return `
                 <tr>
-                    <td><strong>${item.date}</strong></td>
+                    <td><strong>${formattedDate}</strong></td>
                     <td><span class="badge bg-primary">${item.unique_sessions}</span></td>
                     <td><span class="badge bg-info">${item.exercise_visits || 0}</span></td>
                     <td><span class="badge bg-success">${item.quiz_completions || 0}</span></td>
@@ -144,6 +147,28 @@ class AnalyticsDashboard {
                 </tr>
             `;
         }).join('');
+    }
+
+    formatDateForDisplay(dateString) {
+        try {
+            const date = new Date(dateString);
+
+            if (isNaN(date.getTime())) {
+                return 'Fecha inválida';
+            }
+
+            const weekDays = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+
+            const dayOfWeek = weekDays[date.getDay()];
+
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+
+            return `${dayOfWeek}, ${day}/${month}/${year}`;
+        } catch (error) {
+            return 'Error fecha';
+        }
     }
 
     showLoading(elementId) {
